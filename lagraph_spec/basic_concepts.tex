@@ -1,0 +1,323 @@
+\chapter{Basic Concepts}
+\label{Chp:Concepts}
+
+The GraphBLAS C API is used to construct  
+graph algorithms expressed ``in the language of linear algebra.''
+Graphs are expressed as matrices, and the operations over 
+these matrices are generalized through the use of a
+semiring algebraic structure.
+
+In this chapter, we will define the basic concepts used to
+define the GraphBLAS C API.  We provide the following elements:
+\begin{itemize}
+\item Glossary of terms used in this document.  
+
+\item Notation
+
+\item Execution model
+
+\item Error model
+
+\end{itemize}
+
+\section{Glossary}
+
+%TGM I'm leaving a few definitions in here just as examples
+
+\subsection{Basic definitions}
+
+\glossBegin
+
+\glossItem{application} A program that calls methods from the GraphBLAS C API to
+solve a problem.
+
+\glossItem{GraphBLAS C API} The application programming interface that fully defines the types, objects, 
+literals, and other elements of the C binding to the GraphBLAS.
+
+\glossEnd
+
+\subsection{Objects and their structure}
+
+\glossBegin
+\glossItem{handle}  A variable that uses one of the GraphBLAS opaque data types.
+The value of this variable holds a reference to a GraphBLAS object but not the contents of the object itself.
+Hence, assigning a value of one handle to another variable copies the reference to the GraphBLAS object
+but not the contents of the object.
+
+\glossItem{non-opaque datatype} Any datatype that exposes its internal structure.   
+This is contrasted
+with an \emph{opaque datatype} that hides its internal structure and can
+be manipulated only through an API.
+
+\glossEnd
+
+
+
+\vfill
+
+\newgeometry{left=2.5cm,top=2cm,bottom=2cm}
+
+\section{Notation}
+
+\begin{tabular}[H]{l|p{5in}}
+Notation & Description \\
+\hline
+$\Dout, \Dinn, \Din1, \Din2$  & Refers to output and input domains of various GraphBLAS operators. \\
+$\bDout(*), \bDinn(*),$ & Evaluates to output and input domains of GraphBLAS operators (usually \\
+~~~~$\bDin1(*), \bDin2(*)$ & a unary or binary operator, or semiring). \\
+$\mathbf{D}(*)$   & Evaluates to the (only) domain of a GraphBLAS object (usually a monoid, vector, or matrix). \\ 
+$f$             & An arbitrary unary function, usually a component of a unary operator. \\
+$\mathbf{f}(F_u)$ & Evaluates to the unary function contained in the unary operator given as the argument. \\
+$\odot$         & An arbitrary binary function, usually a component of a binary operator. \\
+$\mathbf{\bigodot}(*)$ & Evaluates to the binary function contained in the binary operator or monoid given as the argument. \\
+$\otimes$       & Multiplicative binary operator of a semiring. \\
+$\oplus$        & Additive binary operator of a semiring. \\
+$\mathbf{\bigotimes}(S)$ & Evaluates to the multiplicative binary operator of the semiring given as the argument. \\
+$\mathbf{\bigoplus}(S)$ & Evaluates to the additive binary operator of the semiring given as the argument. \\
+$\mathbf{0}(*)$   & The identity of a monoid, or the additive identity of a GraphBLAS semiring. \\
+$\mathbf{L}(*)$   & The contents (all stored values) of the vector or matrix GraphBLAS objects.  For a vector, it is the set of (index, value) pairs, and for a matrix it is the set of (row, col, value) triples. \\
+$\mathbf{v}(i)$ or $v_i$   & The $i^{th}$ element of the vector $\vector{v}$.\\
+$\mathbf{size}(\vector{v})$ & The size of the vector $\vector{v}$.\\
+$\mathbf{ind}(\vector{v})$ & The set of indices corresponding to the stored values of the vector $\vector{v}$.\\
+$\mathbf{nrows}(\vector{A})$ & The number of rows in the $\matrix{A}$.\\
+$\mathbf{ncols}(\vector{A})$ & The number of columns in the $\matrix{A}$.\\
+$\mathbf{indrow}(\vector{A})$ & The set of row indices corresponding to rows in $\matrix{A}$ that have stored values.  \\
+$\mathbf{indcol}(\vector{A})$ & The set of column indices corresponding to columns in $\matrix{A}$ that have stored values. \\
+$\mathbf{ind}(\vector{A})$ & The set of $(i,j)$ indices corresponding to the stored values of the matrix. \\
+$\mathbf{A}(i,j)$ or $A_{ij}$ & The element of $\matrix{A}$ with row index $i$ and column index $j$.\\
+$\matrix{A}(:,j)$ & The $j^{th}$ column of the the matrix $\matrix{A}$.\\
+$\matrix{A}(i,:)$ & The $i^{th}$ row of the the matrix $\matrix{A}$.\\
+$\matrix{A}^T$ &The transpose of the matrix $\matrix{A}$. \\
+$\neg\matrix{M}$ & The complement of $\matrix{M}$.\\
+$\vector{\widetilde{t}}$ & A temporary object created  by the GraphBLAS implementation. \\
+$<type>$ & A method argument type that is {\sf void *} or one of the types from Table~\ref{Tab:PredefinedTypes}. \\
+{\sf GrB\_ALL} & A method argument literal to indicate that all indices of an input array should be used.\\
+{\sf GrB\_Type} & A method argument type that is either a user defined type or one of the  types from Table~\ref{Tab:PredefinedTypes}.\\
+{\sf GrB\_Object} &  A method argument type referencing any of the GraphBLAS object types.\\
+{\sf GrB\_NULL} & The GraphBLAS NULL.\\
+\end{tabular}
+
+\restoregeometry
+
+\section{Error model}
+
+
+
+\section{Execution Model}
+\label{Sec:ExecutionModel}
+
+%% TGM: I've left the GraphBLAS model here just as a point of reference.
+
+A program using the GraphBLAS C API constructs GraphBLAS objects,
+manipulates them to implement a graph algorithm, and then extracts
+values from the GraphBLAS objects as the result of the algorithm.
+Functions defined within the GraphBLAS C API that manipulate GraphBLAS
+objects are called \emph{methods}.  If the method corresponds to one
+of the operations defined in the GraphBLAS mathematical specification,
+we refer to the method as an \emph{operation}.
+
+Graph algorithms are expressed as an ordered collection of GraphBLAS
+method calls defined by the order they are encountered in a program.
+This is called the \emph{program order}.  Each method in the collection
+uniquely and unambiguously defines the output GraphBLAS objects based
+on the GraphBLAS operation and the input GraphBLAS objects. This is the
+case as long as there are no execution errors, which can put objects in
+an invalid state (see Section~\ref{Sec:ErrorModel}).
+
+The GraphBLAS method calls in program order are organized into contiguous
+and nonoverlapping \emph{sequences}.  A sequence is an ordered collection
+of method calls as encountered by an executing thread. (For more on
+threads and GraphBLAS, see Section~\ref{Sec:ThreadSafety}.)  A sequence
+begins with either (1) the first GraphBLAS method called by a thread,
+or (2) the first method called by a thread after the end of the
+previous sequence.  A sequence can end (terminate) in a variety of ways.
+A call to the GraphBLAS {\sf GrB\_wait()} method (Section~\ref{Sec:GrB_wait})
+always ends a sequence.  The GraphBLAS {\sf GrB\_finalize()} method
+(Section~\ref{Sec:GrB_finalize}) also implicitly ends a sequence. Finally,
+in blocking mode (see below), each GraphBLAS method starts and ends its
+own sequence.
+
+The GraphBLAS objects are fully defined at any point in a sequence by
+the methods in the sequence as long as there are no execution errors.
+In particular, as soon as a GraphBLAS method call returns, its output
+can be used in the next GraphBLAS method call.  However, individual
+operations in a sequence may not be \emph{complete}. We say that an
+operation is complete when all the computations in the operation have
+finished and all the values of its output object have been produced and
+committed to the address space of the program. Furthermore, no additional
+execution time can be charged to a completed operation and no additional
+errors can be attributed to a completed operation.
+
+The opaqueness of GraphBLAS objects allows execution to proceed
+from one method to the next even when operations are not complete.
+Processing of nonopaque objects is never deferred in GraphBLAS. That is,
+methods that consume nonopaque objects (\eg, {\sf GrB\_Matrix\_build()},
+Section~\ref{Sec:Matrix_build}) and methods that produce nonopaque objects (\eg,
+{\sf GrB\_Matrix\_extractTuples()}, Section~\ref{Sec:Matrix_extractTuples})
+always finish consuming or producing those nonopaque objects before
+returning.   
+
+\comment{Furthermore, methods that extract values from opaque GraphBLAS objects
+into nonopaque user objects (see Table~\ref{Tab:ExtractMethods})
+always force completion of all pending computations on the 
+corresponding GraphBLAS source object.
+
+\begin{table}[htb]
+    \hrule
+    \begin{center}
+        \caption{Methods that extract values from a GraphBLAS object, thereby
+        forcing completion of the operations contributing to that particular object.}
+        \label{Tab:ExtractMethods}
+
+        \begin{tabular}{l|l}
+            Method    & Section \\ \hline
+
+            {\sf GrB\_Vector\_nvals}        & \ref{Sec:Vector_nvals}        \\
+            {\sf GrB\_Vector\_extractElement}     & \ref{Sec:extract_single_element_vec}    \\
+            {\sf GrB\_Vector\_extractTuples}    & \ref{Sec:Vector_extractTuples}    \\
+            {\sf GrB\_Matrix\_nvals}        & \ref{Sec:Matrix_nvals}        \\
+            {\sf GrB\_Matrix\_extractElement}     & \ref{Sec:extract_single_element_mat}    \\
+            {\sf GrB\_Matrix\_extractTuples}    & \ref{Sec:Matrix_extractTuples}    \\
+            {\sf GrB\_reduce} (vector-scalar variant)        & \ref{Sec:Reduce_vector_scalar}        \\
+            {\sf GrB\_reduce} (matrix-scalar variant)        & \ref{Sec:Reduce_matrix_scalar}        \\
+        \end{tabular}
+    \end{center}
+    \hrule
+\end{table}
+}
+
+
+\section{Error Model}
+\label{Sec:ErrorModel}
+
+%%TGM  I've left the GraphBLAS model here as a point of reference
+
+All GraphBLAS methods return a value of type {\sf GrB\_Info} to provide
+information available to the system at the time the method returns. The
+returned value can be either {\sf GrB\_SUCCESS} or one of the defined
+error values shown in Table~\ref{Tab:ErrorValues}. The errors fall into
+two groups: API errors (Table~\ref{Tab:ErrorValues}(a)) and execution
+errors (Table~\ref{Tab:ErrorValues}(b)).
+
+\begin{table}[bh]
+\hrule
+\begin{center}
+\caption{Error values returned by GraphBLAS methods.}
+\label{Tab:ErrorValues}
+
+\vspace{1\baselineskip}
+(a) API errors
+\vspace{1\baselineskip}
+
+\begin{tabular}{l|p{3in}}
+Error code    & Description \\ \hline
+{\sf GrB\_UNINITIALIZED\_OBJECT} & A GraphBLAS object is passed to a method before {\sf new} was called on it.\\
+{\sf GrB\_NULL\_POINTER} & A NULL is passed for a pointer parameter. \\
+{\sf GrB\_INVALID\_VALUE} & Miscellaneous incorrect values. \\
+{\sf GrB\_INVALID\_INDEX} & Indices passed are larger than dimensions of the matrix or vector being accessed. \\
+{\sf GrB\_DOMAIN\_MISMATCH} & A mismatch between domains of collections and operations when user-defined domains are in use.\\
+{\sf GrB\_DIMENSION\_MISMATCH} & Operations on matrices and vectors with incompatible dimensions. \\
+{\sf GrB\_OUTPUT\_NOT\_EMPTY} & An attempt was made to build a matrix or vector using an output object that already contains valid tuples (elements).\\
+%{\sf GrB\_NO\_VALUE} & An attempt was made to extract a value from a tuple within a matrix or vector for which there is no stored value. 
+{\sf GrB\_NO\_VALUE} & A location in a matrix or vector is being accessed that has no stored value at the specified location. \scott{It depends on whether or not the non-opaque scalar is
+well-defined on return from {\sf extract}}\\
+\end{tabular}
+
+\vspace{1\baselineskip}
+(b) Execution errors
+\vspace{1\baselineskip}
+
+\begin{tabular}{l|p{3in}}
+Error code    & Description \\ \hline
+{\sf GrB\_OUT\_OF\_MEMORY}         & Not enough memory for operations. \\
+{\sf GrB\_INSUFFICIENT\_SPACE}     & The array provided is not large enough to hold output. \\
+{\sf GrB\_INVALID\_OBJECT}         & One of the opaque GraphBLAS objects (input or output) is in an invalid state caused by a previous execution error. \\
+{\sf GrB\_INDEX\_OUT\_OF\_BOUNDS}  & Reference to a vector or matrix element that is outside the defined dimensions of the object. \\
+{\sf GrB\_PANIC}        & Unknown internal error. \\
+\end{tabular}
+
+\end{center}
+\hrule
+\end{table}
+
+An API error means that a GraphBLAS method was called with parameters that
+violate the rules for that method.  These errors are restricted to those
+that can be determined by inspecting the types and domains of GraphBLAS
+objects, GraphBLAS operators, or the values of scalar parameters fixed at
+the time a method is called.  API errors are deterministic and consistent
+across platforms and implementations.  API errors are never deferred,
+even in nonblocking mode. That is, if a method is called in a manner
+that would generate an API error, it always returns with the appropriate
+API error value.  If a GraphBLAS method returns with an API error, it
+is guaranteed that none of the arguments to the method (or any other
+program data) have been modified.
+
+Execution errors indicate that something went wrong during the execution
+of a legal GraphBLAS method invocation.  Their occurrence may depend on
+specifics of the executing environment and data values being manipulated.
+This does not mean that execution errors are the fault of the GraphBLAS
+implementation.  For example, a memory leak could arise from an error in
+an application's source code (a ``program error''), but it may manifest
+itself in different points of a program's execution (or not at all)
+depending on the platform, problem size, or what else is running at
+that time.  Index-out-of-bounds and insuficient space execution errors
+always indicate a program error.
+
+In blocking mode, where each method executes to completion, a returned
+execution error value applies to the specific method.  If a GraphBLAS
+method, executing in blocking mode, returns with any execution error
+from Table~\ref{Tab:ErrorValues}(b) other than {\sf GrB\_PANIC}, it
+is guaranteed that no argument used as input-only has been modified.
+Output arguments may be left in an invalid state, and their use downstream
+in the program flow may cause additional errors.  If a GraphBLAS method
+returns with a {\sf GrB\_PANIC} execution error, no guarantees can be
+made about the state of any program data.
+
+In nonblocking mode, execution errors can be deferred.  A return value
+of {\sf GrB\_SUCCESS} only guarantees that there are no API errors in
+the method invocation.  If an execution error value is returned by a
+method in nonblocking mode, it indicates that an error was found during
+execution of the sequence, up to and including the {\sf GrB\_wait()}
+method (Section~\ref{Sec:GrB_wait}) call that ends the sequence. When possible, that return value
+will provide information concerning the cause of the error.
+
+As discussed in Section~\ref{Sec:GrB_waitOne}, a {\sf GrB\_wait(obj)} on
+a specific GraphBLAS object {\sf obj} does not necessarily end a
+sequence. However, no additional errors on the methods of the sequence that 
+have {\sf obj} as an {\sf OUT} or {\sf INOUT} argument can be reported.
+From a GraphBLAS perspective, those methods are {\em complete}.
+
+If a GraphBLAS method, executing in nonblocking mode, returns with
+any execution error from Table~\ref{Tab:ErrorValues}(b) other than
+{\sf GrB\_PANIC}, it is guaranteed that no argument used as input-only
+through the entire sequence has been modified.  Any output argument in
+the sequence may be left in an invalid state and its use downstream in the
+program flow may cause additional errors.  If a GraphBLAS method returns
+with a {\sf GrB\_PANIC}, no guarantees can be made about the state of
+any program data.
+
+\begin{figure}[tb]
+    \hrule
+    \vspace{1\baselineskip}
+    \begin{center}
+        \begin{minipage}{3in}
+            \begin{verbatim}
+            const char *GrB_error();
+            \end{verbatim}
+        \end{minipage}
+    \end{center}
+    \caption{Signature of {\sf GrB\_error()} function.}
+    \label{Fig:GrB_error}
+    \hrule
+\end{figure}
+
+After a call to any GraphBLAS method, the program can retrieve additional
+error information (beyond the error code returned by the method) though a
+call to the function {\sf GrB\_error()}. The signature of that function is
+shown in Figure~\ref{Fig:GrB_error}.  The function returns a pointer to a 
+NULL-terminated string, and the contents of that string are implementation 
+dependent. In particular, a null string (not a {\sf NULL} pointer) is always a valid error string.
+The pointer is valid until the next call to any GraphBLAS method by the same thread.
+{\sf GrB\_error()} is a thread-safe function, in the sense that multiple threads can
+call it simultaneously and each will get its own error string back, referring to the
+last GraphBLAS method it called.
