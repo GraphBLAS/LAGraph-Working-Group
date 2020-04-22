@@ -1,6 +1,13 @@
 
-// LAGr_Matrix: A matrix, not a graph.
-// not opaque or NOT
+// Every LAGraph function has a descriptor input (opaque?)
+// modes:
+//      debug: check all properties
+//      etc: ...
+//      raw:
+
+// LAGr_Matrix: A matrix, not a graph:  opaque?
+
+// blocking and non-blocking?
 
     G->stuff = x
     LAGr_set_stuff (G, x)
