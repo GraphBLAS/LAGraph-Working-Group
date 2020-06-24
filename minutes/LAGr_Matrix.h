@@ -5,7 +5,7 @@
 //      etc: ...
 //      raw:
 
-// LAGr_Matrix: A matrix, not a graph:  opaque?
+// LAGr_Matrix: A matrix, not a graph:  [ opaque ]
 
 // blocking and non-blocking?
 
@@ -14,17 +14,19 @@
 
 typedef struct
 {
-    GrB_Matrix A
-    kind                // adjacency, incidence, bipartite?, hypergraph?, ...
-                        // none of the above
-    symmetry            // yes, no, unknown
-    diagonal            // yes, no, unknown ...
-    typeid              // enum? for now
+    GrB_Matrix A    // one matrix
+    symmetry        // yes, no, unknown
+    typeid          // enum for now int8, int16, .... user
+    typestring      // name of user defined type, or "GrB_INT8"
+
+    diagonal        // yes (any neg? all pos? all >=0), no, unknown ...
+    cc              
+    kind  ?         // adjacency, incidence, bipartite?, hypergraph?, ...
+                    // none of the above
 
     char name [64] ;
 
-    // ...
-
+    // ... hidden:  implementation defined
     MPI_comm_world stuff
     FPGA stuff
     GPU stuff ...
