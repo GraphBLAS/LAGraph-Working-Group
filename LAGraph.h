@@ -71,19 +71,23 @@ GrB_Info LAGraph_BreadthFirstSearch_Frontier
     // input/output:
     GrB_Vector frontier,
     // inputs:
+    LAGraph_Graph G,
     GrB_Vector vertex_mask,         // filter the vertices
     bool vertex_mask_complement,
     bool vertex_mask_structural,
 //  or:
 //  GrB_Descriptor desc,    // mask complement, mask structural:
 //                          // NULL, GrB_DESC_C, GrB_DESC_S, or GrB_DESC_SC
-    LAGraph_Graph G,
     uint64_t hops           // if hops=0, no limit (or INT64_MAX), or "NONE"
 ) ;
 
 //------------------------------------------------------------------------------
 // connected components:
 //------------------------------------------------------------------------------
+
+// TODO: utility to do SCC = Comm * G * Comm'
+// TODO: utility to do Gnew = Perm * G * Perm' ; or Gnew = G (P,P)
+// TODO: utility to convert Perm matrix <==> perm "vector" (array?) GrB_Index*
 
 // SCC graph = Community * G * Community', a contracted graph
 
@@ -110,6 +114,7 @@ GrB_Info LAGraph_ConnectedComponents
     // output:
     GrB_Matrix *Community,  // k-by-n if there are k components.  GrB_BOOL.
                             // Community(c,i)=1 if c=component(i)
+                            // TODO: or n-by-k?
     // input:
     LAGraph_Graph G         // if directed: strongly cc
 ) ;
@@ -124,8 +129,42 @@ GrB_Info LAGraph_ConnectedComponents_Weakly
 ) ;
 
 //------------------------------------------------------------------------------
-// centrality: up next
+// centrality:
 //------------------------------------------------------------------------------
 
-// random number generator?  node sampler?
+// TODO: utility to remove self loops, or add all self-loops (G=G+I), ...
+// TODO: utility like trace(G), trace-like methods
+// TODO: G =G+G', G = spones(G)
 
+// random number generator?  vertex sampler?
+// exact vs approx
+
+GrB_Info LAGraph_VertexCentrality
+(
+    // output:
+    GrB_Vector *centrality,
+
+    // input:
+    LAGraph_Graph G,
+    enum kind               // betweeness, eigenvector, degree, pagerank, ...
+) ;
+
+LAGraph_VertexCentrality (&degree, G, LAGR_OUTDEGREE) ;
+LAGraph_Degree (&degree, G, in? out? G+G'? selfloops? sum weights?) ;
+LAGraph_VertexCentrality (&degree, G, LAGR_OUTDEGREE | LAGR_NOSELFLOOPS) ;
+
+
+GrB_Info LAGraph_EdgeCentrality
+(
+    // output:
+    GrB_Matrix *Centrality,
+
+    // input:
+    LAGraph_Graph G,
+    enum kind               // betweeness, eigenvector, degree, pagerank, ...
+) ;
+
+
+//------------------------------------------------------------------------------
+// shortest paths:
+//------------------------------------------------------------------------------
