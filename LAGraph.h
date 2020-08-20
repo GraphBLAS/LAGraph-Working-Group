@@ -41,13 +41,15 @@ or
 // breadth first search
 //------------------------------------------------------------------------------
 
+// Policy: in general, if an input *x is NULL, do not compute
+
 // TODO: hops for all methods?
 
 GrB_Info LAGraph_BreadthFirstSearch     // no _Variant suffix
 (
     // outputs:
-    GrB_Vector *level,
-    GrB_Vector *parent,
+    GrB_Vector *level,              // if NULL do not compute
+    GrB_Vector *parent,             // if NULL do not compute
     // inputs:
     LAGraph_Graph G,
     GrB_Index source
@@ -56,8 +58,8 @@ GrB_Info LAGraph_BreadthFirstSearch     // no _Variant suffix
 GrB_Info LAGraph_BreadthFirstSearch_MultiSource
 (
     // outputs:
-    GrB_Matrix *level,
-    GrB_Matrix *parent,
+    GrB_Matrix *level,              // if NULL do not compute
+    GrB_Matrix *parent,             // if NULL do not compute
     // inputs:
     LAGraph_Graph G,
     GrB_Index *sources, size_t nsources     // or LAGraph_array?  GrB_array?
@@ -66,7 +68,7 @@ GrB_Info LAGraph_BreadthFirstSearch_MultiSource
 GrB_Info LAGraph_BreadthFirstSearch_Frontier
 (
     // outputs:
-    GrB_Vector *level,
+    GrB_Vector *level,              // should this be input/output?
     GrB_Vector *parent,
     // input/output:
     GrB_Vector frontier,
@@ -94,7 +96,7 @@ GrB_Info LAGraph_BreadthFirstSearch_Frontier
 GrB_Info LAGraph_Community_Map
 (
     // output:
-    uint64_t &ncomponents,
+    uint64_t *ncomponents,
     GrB_Vector *component,  // vertex i is in component(i), a dense vector.
     // input:
     GrB_Matrix Community    // Community(c,i)=1 becomes c=component(i)
@@ -104,7 +106,7 @@ GrB_Info LAGraph_Community_Map
 GrB_Info LAGraph_Community_Permutation
 (
     // output:
-    GrB_Matrix Perm,        // Perm(...), n-by-n
+    GrB_Matrix *Perm,        // Perm(...), n-by-n
     // input:
     GrB_Matrix Community    // Community(c,i)=1 becomes c=component(i)
 ) ;
@@ -139,6 +141,16 @@ GrB_Info LAGraph_ConnectedComponents_Weakly
 // random number generator?  vertex sampler?
 // exact vs approx
 
+// TODO make 2 different typedef enums, for VertexC. and EdgeC.
+
+typedef enum
+{
+    LAGR_BETWEENNESS_FP32 = 4,
+    LAGR_BETWEENNESS_FP64 = 5, 
+    ...
+}
+LAGraph_VertexCentrality_Type ;
+
 GrB_Info LAGraph_VertexCentrality
 (
     // output:
@@ -146,12 +158,17 @@ GrB_Info LAGraph_VertexCentrality
 
     // input:
     LAGraph_Graph G,
-    enum kind               // betweeness, eigenvector, degree, pagerank, ...
+    LAGraph_VertexCentrality_Type kind
+                            // betweenness, eigenvector, degree, pagerank, ...
+                            // which pagerank? parameters to pagerank?
+                            // LAGR_BETWEENNESS_FP32,
+                            // LAGR_BETWEENNESS_FP64
 ) ;
 
 LAGraph_VertexCentrality (&degree, G, LAGR_OUTDEGREE) ;
-LAGraph_Degree (&degree, G, in? out? G+G'? selfloops? sum weights?) ;
-LAGraph_VertexCentrality (&degree, G, LAGR_OUTDEGREE | LAGR_NOSELFLOOPS) ;
+
+// utility function:
+LAGraph_Degree (&degree, G, kind)
 
 
 GrB_Info LAGraph_EdgeCentrality
@@ -161,10 +178,46 @@ GrB_Info LAGraph_EdgeCentrality
 
     // input:
     LAGraph_Graph G,
-    enum kind               // betweeness, eigenvector, degree, pagerank, ...
+    LAGraph_EdgeCentrality_Type kind
+                            // betweeness, eigenvector, degree, pagerank, ...
+                            // LAGR_BETWEENNESS_FP32,
+                            // LAGR_BETWEENNESS_FP64
 ) ;
 
 
 //------------------------------------------------------------------------------
 // shortest paths:
 //------------------------------------------------------------------------------
+
+GrB_Info LAGraph_ShortestPath_[...]
+
+GrB_Info LAGraph_ShortestPath_SingleSource
+(
+    // output: if NULL do not compute
+    GrB_Vector *distance,       // type: INT64, FP32, or FP64
+                                // INT64: if G is int*
+                                // UINT64: if G is bool, uint*
+                                // FP32: if G is FP32
+                                // FP64: if G is FP64
+    GrB_Vector *parent,         // tree
+    GrB_Vector *hops,           // # of hops, level from source
+
+    // input:
+    GrB_Index source,
+    LAGraph_Graph G,
+) ;
+
+GrB_Info LAGraph_ShortestPath_SingleSourceSingleDestination
+
+GrB_Info LAGraph_ShortestPath_MultiSource ??
+
+GrB_Info LAGraph_ShortestPath_AllPairs
+
+//------------------------------------------------------------------------------
+// what's next?
+//------------------------------------------------------------------------------
+
+GAP: BFS, SSSP, TriangleCount, Conn.Components, PageRank, BetweennessCentrality
+
+LDBC: Local Clustering Coef, CDLP, different PageRank
+
