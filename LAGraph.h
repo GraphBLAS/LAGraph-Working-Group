@@ -65,12 +65,12 @@ GrB_Info LAGraph_BreadthFirstSearch_MultiSource
     GrB_Index *sources, size_t nsources     // or LAGraph_array?  GrB_array?
 ) ;
 
+// expert function:
 GrB_Info LAGraph_BreadthFirstSearch_Frontier
 (
-    // outputs:
-    GrB_Vector *level,              // should this be input/output?
-    GrB_Vector *parent,
     // input/output:
+    GrB_Vector level,
+    GrB_Vector parent,
     GrB_Vector frontier,
     // inputs:
     LAGraph_Graph G,
@@ -151,6 +151,15 @@ typedef enum
 }
 LAGraph_VertexCentrality_Type ;
 
+// this: easy mode
+GrB_Vector centrality ; // uninit
+LAGraph_something (&centrality, ...)
+// then for 'expert' mode
+GrB_Vector x ; // 
+LAGraph_something_init (&x, ...)     or GrB_Vector_new (&x, n, 1, INT32)
+    for a billion times:
+        LAGraph_something_tiny (x, ...)        // reuse it, might be faster
+
 GrB_Info LAGraph_VertexCentrality
 (
     // output:
@@ -169,7 +178,10 @@ LAGraph_VertexCentrality (&degree, G, LAGR_OUTDEGREE) ;
 
 // utility function:
 LAGraph_Degree (&degree, G, kind)
-
+// or:
+LAGraph_Degree_in (&degree, G)
+LAGraph_Degree_out (&degree, G) // ... etc
+LAGraph_Degree_etc (&degree, G) // ... etc
 
 GrB_Info LAGraph_EdgeCentrality
 (
@@ -207,11 +219,19 @@ GrB_Info LAGraph_ShortestPath_SingleSource
     LAGraph_Graph G,
 ) ;
 
-GrB_Info LAGraph_ShortestPath_SingleSourceSingleDestination
-
-GrB_Info LAGraph_ShortestPath_MultiSource ??
+            // later: or not at all:
+            // GrB_Info LAGraph_ShortestPath_SingleSourceSingleDestination
+            // GrB_Info LAGraph_ShortestPath_MultiSource ??
 
 GrB_Info LAGraph_ShortestPath_AllPairs
+(
+    // output:
+    GrB_Matrix *Distance,
+    GrB_Matrix *Parent,
+    GrB_Matrix *Hops,
+    // input:
+    LAGraph_Graph G,
+) ;
 
 //------------------------------------------------------------------------------
 // what's next?
