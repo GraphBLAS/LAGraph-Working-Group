@@ -65,6 +65,9 @@ GrB_Info LAGraph_BreadthFirstSearch_MultiSource
     GrB_Index *sources, size_t nsources     // or LAGraph_array?  GrB_array?
 ) ;
 
+info = LAGraph_whatever (&level, NULL, G, Src, 5) ;
+if info is 'error' then level is returned as level == NULL.
+
 // expert function:
 GrB_Info LAGraph_BreadthFirstSearch_Frontier
 (
@@ -205,6 +208,9 @@ GrB_Info LAGraph_ShortestPath_[...]
 
 GrB_Info LAGraph_ShortestPath_SingleSource
 (
+    // output:
+    LAGraph_info *LGInfo,
+
     // output: if NULL do not compute
     GrB_Vector *distance,       // type: INT64, FP32, or FP64
                                 // INT64: if G is int*
@@ -216,8 +222,57 @@ GrB_Info LAGraph_ShortestPath_SingleSource
 
     // input:
     GrB_Index source,
-    LAGraph_Graph G,
+    LAGraph_Graph G 
 ) ;
+
+    // negative-weight-cycle: result is not defined, must stop!
+    // report info = GrB_NO_VALUE. or something else
+
+// there is no:
+GrB_set_error (C, string)
+char *GrB_Matrix_error (GrB_Matrix C) ;
+char *GrB_error (object) ; // polymorphic
+
+// one solution:  but what if 2 LAGraph calls want to use G at the same time?
+// G is input, and GrB_Matrix_wait(G->A) has been done so it is read-only.
+// ... except for the error string here...
+    char *LAGraph_report (G) ;
+
+// another solution:
+typedef struct
+{
+    GrB_Info info ;
+    char message [128] ;
+}
+LAGraph_Info ;
+
+typedef enum    // we need an LAGraph_Info
+{
+    // success, but ...:
+    GrB_SUCCESS = 0,            // all is well
+    GrB_NO_VALUE = 1,           // A(i,j) requested but not there
+    LAGraph_something_else = 101,
+
+    // API errors:
+    GrB_UNINITIALIZED_OBJECT = 2,   // object has not been initialized
+    GrB_INVALID_OBJECT = 3,         // object is corrupted
+    GrB_NULL_POINTER = 4,           // input pointer is NULL
+    GrB_INVALID_VALUE = 5,          // generic error code; some value is bad
+    GrB_INVALID_INDEX = 6,          // a row or column index is out of bounds;
+                                    // used for indices passed as scalars, not
+                                    // in a list.
+    GrB_DOMAIN_MISMATCH = 7,        // object domains are not compatible
+    GrB_DIMENSION_MISMATCH = 8,     // matrix dimensions do not match
+    GrB_OUTPUT_NOT_EMPTY = 9,       // output matrix already has values in it
+
+    // execution errors:
+    GrB_OUT_OF_MEMORY = 10,         // out of memory
+    GrB_INSUFFICIENT_SPACE = 11,    // output array not large enough
+    GrB_INDEX_OUT_OF_BOUNDS = 12,   // a row or column index is out of bounds;
+                                    // used for indices in a list of indices.
+    GrB_PANIC = 13                  // unknown error, or GrB_init not called.
+}
+LAGraph_info ;
 
             // later: or not at all:
             // GrB_Info LAGraph_ShortestPath_SingleSourceSingleDestination
@@ -232,6 +287,9 @@ GrB_Info LAGraph_ShortestPath_AllPairs
     // input:
     LAGraph_Graph G,
 ) ;
+
+// Dist, Parent undefined on input, created on output, just like GrB_Matrix_new
+info = LAGraph_something (&Dist, &Parent, NULL, G) ;
 
 //------------------------------------------------------------------------------
 // what's next?
