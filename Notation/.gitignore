@@ -1,4 +1,5 @@
 # Ignore these files:
+*.out
 *.aux
 *.aux 
 *.bbl 
