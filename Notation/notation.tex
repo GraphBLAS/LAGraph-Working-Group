@@ -1,0 +1,302 @@
+\documentclass[11pt]{article}
+% \textwidth=6in
+% \textheight=9in
+% \oddsidemargin=0.25in
+% \evensidemargin=0.25in
+% \marginparwidth=0in
+% \marginparsep=0in
+% \topmargin=0in
+% \headheight=0in
+% \headsep=0in
+% \topskip=0in
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{lscape}
+\usepackage{longtable}
+\usepackage{graphics}
+\usepackage[pdftex]{graphicx}
+\usepackage{color}
+\usepackage{rotating}
+\newcommand{\hilight}[1]{\colorbox{yellow}{#1}}
+
+\newenvironment{packed_itemize}{
+\begin{itemize}
+  \setlength{\itemsep}{1pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+}{\end{itemize}}
+
+\title{Options for a consistent GraphBLAS notation}
+\author{Tim Davis}
+\date{\today}
+\begin{document}
+
+\maketitle
+
+\section{Creating matrices}
+
+\begin{itemize}
+\item[] in the C API: \verb'GrB_Matrix_new (&A, m, n, GrB_INT64)'
+\item[] in ASCII: \verb'A = int16(m,n)' (I'm open to suggestions for this)
+\item[] in LaTeX: $\mbox{let: } {\bf A} \in \mathbb{Z}^{m \times n}_{16}$
+\end{itemize}
+
+\section{Mask computation}
+
+In the following table the ``mask'' column is the value of the
+mask after applying the value/structural option and optionally
+complementing the mask.  If no mask is present (and not complemented)
+then mask is 1.  If no mask is present (yet complemented) then the mask is
+always 0; this has no effect unless the Replace option is also used.
+
+The repl column in the table is ``yes'' if Replace is enabled, ``no'' otherwise.
+The accum column in the table is ``yes'' if the accum is 
+present, ``no'' otherwise.
+The ${\bf C}$ column is listed as $c_{ij}$ if that entry is present,
+and a dash otherwise, likewise for the ${\bf A}$ column.
+
+\begin{table}
+{\small
+\begin{tabular}{lllll|l}
+\hline
+repl & accum & ${\bf C}$ & ${\bf A}$ & mask & action taken by ${\bf C \langle M \rangle = C \odot A}$ \\
+\hline
+\hline
+       &    &          &           &      & \verb'C<M>=A' and \verb'C<!M>=A' \\
+\hline
+    -  &-   & $c_{ij}$ & $a_{ij}$  & 1    &  $c_{ij} = a_{ij}$, update \\
+    -  &-   &  -       & $a_{ij}$  & 1    &  $c_{ij} = a_{ij}$, insert \\
+    -  &-   & $c_{ij}$ &  -        & 1    &  delete $c_{ij}$ because $a_{ij}$ not present \\
+    -  &-   &  -       &  -        & 1    &   \\
+\hline
+    -  &-   & $c_{ij}$ & $a_{ij}$  & 0    &   \\
+    -  &-   &  -       & $a_{ij}$  & 0    &   \\
+    -  &-   & $c_{ij}$ &  -        & 0    &   \\
+    -  &-   &  -       &  -        & 0    &   \\
+\hline
+\hline
+       &    &          &           &      & \verb'C<M,repl>=A' and \verb'C<!M,repl>=A' \\
+\hline
+    yes&-   & $c_{ij}$ & $a_{ij}$  & 1    &  $c_{ij} = a_{ij}$, update \\
+    yes&-   &  -       & $a_{ij}$  & 1    &  $c_{ij} = a_{ij}$, insert \\
+    yes&-   & $c_{ij}$ &  -        & 1    &  delete $c_{ij}$ because $a_{ij}$ not present \\
+    yes&-   &  -       &  -        & 1    &   \\
+\hline
+    yes&-   & $c_{ij}$ & $a_{ij}$  & 0    &  delete $c_{ij}$  (because of \verb'GrB_REPLACE') \\
+    yes&-   &  -       & $a_{ij}$  & 0    &   \\
+    yes&-   & $c_{ij}$ &  -        & 0    &  delete $c_{ij}$  (because of \verb'GrB_REPLACE') \\
+    yes&-   &  -       &  -        & 0    &   \\
+\hline
+\hline
+       &    &          &           &      & \verb'C<M>+=A' and \verb'C<!M>+=A' \\
+\hline
+    -  &yes & $c_{ij}$ & $a_{ij}$  & 1    &  $c_{ij} = c_{ij} \odot a_{ij}$, apply accumulator \\
+    -  &yes &  -       & $a_{ij}$  & 1    &  $c_{ij} = a_{ij}$, insert \\
+    -  &yes & $c_{ij}$ &  -        & 1    &   \\
+    -  &yes &  -       &  -        & 1    &   \\
+\hline
+    -  &yes & $c_{ij}$ & $a_{ij}$  & 0    &   \\
+    -  &yes &  -       & $a_{ij}$  & 0    &   \\
+    -  &yes & $c_{ij}$ &  -        & 0    &   \\
+    -  &yes &  -       &  -        & 0    &   \\
+\hline
+\hline
+       &    &          &           &      & \verb'C<M,repl>+=A' and \verb'C<!M,repl>+=A' \\
+\hline
+    yes&yes & $c_{ij}$ & $a_{ij}$  & 1    &  $c_{ij} = c_{ij} \odot a_{ij}$, apply accumulator \\
+    yes&yes &  -       & $a_{ij}$  & 1    &  $c_{ij} = a_{ij}$, insert \\
+    yes&yes & $c_{ij}$ &  -        & 1    &   \\
+    yes&yes &  -       &  -        & 1    &   \\
+\hline
+
+\hline
+    yes&yes & $c_{ij}$ & $a_{ij}$  & 0    &  delete $c_{ij}$  (because of \verb'GrB_REPLACE') \\
+    yes&yes &  -       & $a_{ij}$  & 0    &   \\
+    yes&yes & $c_{ij}$ &  -        & 0    &  delete $c_{ij}$  (because of \verb'GrB_REPLACE') \\
+    yes&yes &  -       &  -        & 0    &   \\
+\hline
+\end{tabular}
+}
+\caption{Results of the mask/accumulator phase \label{tab:maskaccum}}
+\end{table}
+
+\newpage
+\section{For Mask/Accum/Replace: there are 32 variants}
+
+All these options can affect each other so there are 32 variants total,
+except that when no mask is present, the value/structural option makes
+no difference.
+
+\begin{itemize}
+\item the mask ${\bf M}$ can be present, or not present.
+\item the mask can be complemented, or not (even when no mask is present)
+\item the mask can be valued or structural
+\item the replace option can be enabled, or not.
+\item the accumulator can be present, or not.
+\end{itemize}
+
+\begin{itemize}
+\item plain mask, with accum:
+
+    \begin{itemize}
+    \item[] in ASCII: \verb'C<M>+=A'
+    \item[] in LaTex: $\bf C \langle M \rangle \odot\!\!= A $
+    \end{itemize}
+
+\item negated mask, with accum.  Several options for LaTeX.
+I like the $\overline{\bf M}$ since it is more compact, but it
+has problems when $\bf M$ is also structural (see below).
+
+    \begin{itemize}
+    \item[] in ASCII: \verb'C<!M>+=A'
+    \item[] in LaTex: $\bf C \langle \neg M \rangle \odot\!\!= A$
+    \item[] in LaTex:  $\bf C \langle \overline{M} \rangle \odot\!\!= A$
+    \end{itemize}
+
+\item structural mask, not complemented:
+using $s({\bf M})$ where $s$ stands for structural.
+This feels wordy to me.  Not elegant.
+The letter $s$ could be confused for a vector or scalar.
+
+    \begin{itemize}
+    \item[] in ASCII: \verb'C<s(M)>+=A'
+    \item[] in LaTex:  ${\bf C} \langle s({\bf M}) \rangle \odot\!\!= {\bf A}$
+    \end{itemize}
+
+\item structural mask alternatives.  The letter $s$ could be confused
+for a scalar or vector, so a Greek letter could be used instead,
+such as sigma ($\sigma$).  But this is also wordy.
+
+    \begin{itemize}
+    \item[] in ASCII: \verb'C<s(M)>+=A'
+    \item[] in LaTex:  ${\bf C} \langle \sigma({\bf M}) \rangle \odot\!\!= {\bf A}$
+    \end{itemize}
+
+\item structural mask alternative.  The notation 
+$s({\bf M})$ is a little wordy.  The Mask cannot be transposed in a
+single call to \verb'GrB_anything' so a superscript would work.  But a
+subscript might be better, because someone might want to indicate a
+transposed mask (which would have to be done as a separate call to
+\verb'GrB_transpose').  This doesn't look good in ASCII however:
+
+    \begin{itemize}
+    \item[] in ASCII: \verb'C<M_s>+=A'
+    \item[] in LaTex:  ${\bf C} \langle {\bf M}_s \rangle \odot\!\!= {\bf A}$
+    \end{itemize}
+
+\item structural mask: why not use set notation?  The structure of ${\bf M}$
+is a set of the entries of ${\bf M}$.  In a sense, selecting the
+structural option in the descriptor converts ${\bf M}$
+into a set.  So how about set notation, with curly brackets?
+We don't use curly brackets anywhere else in GraphBLAS, so this is unambigous.
+I like this the best.
+
+    \begin{itemize}
+    \item[] in ASCII: \verb'C<{M}>+=A'
+    \item[] in LaTex:  ${\bf C} \langle \{{\bf M}\} \rangle \odot\!\!= {\bf A}$
+    \end{itemize}
+
+\item complemented structural mask, for $s({\bf M})$:
+
+    \begin{itemize}
+    \item[] in ASCII: \verb'C<!s(M)>+=A'
+    \item[] in LaTex:  ${\bf C} \langle \neg s({\bf M}) \rangle \odot\!\!= {\bf A}$
+    \end{itemize}
+
+\item  complemented structural mask, for the curly bracket option:
+It is important to note that the structure of ${\bf M}$ is taken
+first, and then complemented.  Not the other way around.
+I like this option the best (with $\neg$).
+
+    \begin{itemize}
+    \item[] ASCII: \verb'C<!{M}>+=A'
+    \item[] LaTeX: ${\bf C} \langle \neg \{{\bf M}\} \rangle \odot\!\!= {\bf A}$
+    \item[] LaTeX:
+    ${\bf C} \langle \overline{ \{{\bf M}\}} \rangle \odot\!\!= {\bf A}$
+    ouch.  That is a long overline, and could be confused with
+    ${\bf C} \langle  \{\overline{\bf M}\} \rangle \odot\!\!= {\bf A}$
+    \end{itemize}
+
+\end{itemize}
+
+\newpage
+
+\section{Replace option}
+
+The examples consider all options except for Replace.
+Here are some ideas; I am not really happy with any of them.
+
+\begin{itemize}
+
+\item simple case: a mask with replace
+
+    \begin{itemize}
+    \item[] in ASCII: \verb'C<M,replace>+=A'
+    \item[] in LaTex: $\bf C \langle M, \mbox{replace} \rangle \odot\!\!= A $
+    \end{itemize}
+
+\item complemented structural mask with replace
+
+    \begin{itemize}
+    \item[] ASCII: \verb'C<!{M},replace>+=A'
+    \item[] LaTeX: ${\bf C} \langle \neg \{{\bf M}\}, \mbox{replace}
+    \rangle \odot\!\!= {\bf A}$
+    \end{itemize}
+
+\item no mask, yet complemented, with replace.  This does actual work that
+does not depend on the input matrix $\bf A$ or input scalar.
+
+    \begin{itemize}
+    \item[] ASCII: \verb'C<!,replace>=A'
+    \item[] LaTeX: ${\bf C} \langle \neg, \mbox{replace}
+    \rangle \odot\!\!= {\bf A}$
+    \end{itemize}
+
+\end{itemize}
+
+\section{Different accum operators}
+
+The accum operator can be any function, such as PLUS, TIMES, FIRST, MIN, MAX,
+ANY, logical OR, logical AND etc.  I propose using using symbols from C/C++ if 
+available, or spelling out the function otherwise.
+Assuming no mask/replace/complement, in ASCII:
+
+    \begin{itemize}
+    \item[] \verb'C +=A ' plus
+    \item[] \verb'C *= A ' times
+    \item[] \verb'C &&= A ' logical AND
+    \item[] \verb'C &= A ' bitwise AND
+    \item[] \verb'C ||= A ' logical OR
+    \item[] \verb'C |= A ' bitwise OR
+    \item[] \verb'C ^= A ' logical XOR, but see the XOR in LaTeX below
+    \item[] \verb'C /= A ' divide
+    \item[] \verb'C max= A ' maximum
+    \item[] \verb'C any= A ', this is Tim's \verb'GxB_ANY_*' operator.
+    \item[] \verb'C first= A '
+    \item[] and so on
+    \end{itemize}
+
+In LaTeX, it is very similar.  Note the spacing:
+
+    \begin{itemize}
+    \item[] $\bf C \,+\!\!= A $, plus
+    \item[] Latex source of the above: \verb'$\bf C \,+\!\!= A$'
+    \item[] $\bf C \,*\!\!= A $, times
+    \item[] $\bf C \,\wedge\!\!= A $, logical AND
+    \item[] $\bf C \,\&\!\!= A $, bitwise AND
+    \item[] $\bf C \,\vee\!\!= A $, logical OR
+    \item[] $\bf C \,|\!\!= A $, bitwise OR
+    \item[] $\bf C \,\oplus\!\!= A $, logical XOR?  but this conflicts with
+        the use of $\oplus$ to denote a generic additive operator.
+        So perhaps logical XOR should be written
+        $\bf C \,\mbox{xor}\!\!= A $.
+    \item[] $\bf C \,/\!\!= A $, divide, or perhaps
+        $\bf C \,\div\!\!= A $
+    \item[] $\bf C \,\mbox{max}\!\!= A $, maximum
+    \item[] $\bf C \,\mbox{any}\!\!= A $, ANY
+    \item[] $\bf C \,\mbox{first}\!\!= A $, FIRST
+    \item[] and so on
+    \end{itemize}
+
+\end{document}
+
