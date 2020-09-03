@@ -1,0 +1,14 @@
+# Ignore these files:
+*.aux
+*.aux 
+*.bbl 
+*.blg 
+*.log 
+*.toc 
+*.dvi 
+*.lof 
+*.lot
+
+# Do not ignore this file
+!.gitignore
+
