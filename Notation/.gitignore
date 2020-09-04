@@ -9,7 +9,9 @@
 *.dvi 
 *.lof 
 *.lot
+*.fdb_latexmk
+*.fls
+*.synctex.gz
 
 # Do not ignore this file
 !.gitignore
-

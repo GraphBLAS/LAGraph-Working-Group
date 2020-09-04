@@ -27,7 +27,7 @@
 }{\end{itemize}}
 
 \title{Options for a consistent GraphBLAS notation}
-\author{Tim Davis}
+\author{Tim Davis, Gabor Szarnyas}
 \date{\today}
 \begin{document}
 
@@ -222,6 +222,8 @@ I like this option the best (with $\neg$).
 
 \end{itemize}
 
+(Gabor) I like the set notation for the ``structure'' option and the $\neg$ symbol for negation.
+
 \newpage
 
 \section{Replace option}
@@ -254,6 +256,36 @@ does not depend on the input matrix $\bf A$ or input scalar.
     \item[] LaTeX: ${\bf C} \langle \neg, \mbox{replace}
     \rangle \odot\!\!= {\bf A}$
     \end{itemize}
+
+\end{itemize}
+
+\subsection{(Gabor) Alternative}
+
+How about double angle brackets for ``replace''? This could symbolize that the computation only keeps that part by the mask and discards the rest.
+
+\begin{itemize}
+
+    \item simple case: a mask with replace
+    
+        \begin{itemize}
+        \item[] in ASCII: \verb'C<<M>>+=A'
+        \item[] in LaTex: $\bf C \langle\!\langle M \rangle\!\rangle \odot\!\!= A $
+        \end{itemize}
+    
+    \item complemented structural mask with replace
+    
+        \begin{itemize}
+        \item[] ASCII: \verb'C<<!{M}>>+=A'
+        \item[] LaTeX: ${\bf C} \langle\!\langle \neg \{{\bf M}\}
+        \rangle\!\rangle \odot\!\!= {\bf A}$
+        \end{itemize}
+    
+    \item no mask, yet complemented, with replace
+    
+        \begin{itemize}
+        \item[] ASCII: \verb'C<<!>>=A'
+        \item[] LaTeX: ${\bf C} \langle\!\langle \neg \rangle\!\rangle \odot\!\!= {\bf A}$
+        \end{itemize}
 
 \end{itemize}
 
@@ -300,6 +332,9 @@ In LaTeX, it is very similar.  Note the spacing:
     \item[] $\bf C \,\mbox{first}\!\!= A $, FIRST
     \item[] and so on
     \end{itemize}
+
+(Gabor) I propose to use \verb+\mathbin{}+ for spacing around the operator, e.g., $\bf C \mathbin{+\!\!=} A $.
+
 
 \end{document}
 
