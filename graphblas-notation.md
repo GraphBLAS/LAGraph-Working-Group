@@ -1,6 +1,12 @@
 # GraphBLAS notation
 
-This is a working document to come up with a notation for typsetting the pseudocode of LAGraph algorithms.
+This is a working document to come up with a notation for typesetting the pseudocode of LAGraph algorithms.
+
+## Requirements
+
+We would like to come up with a consistent notation in LaTeX that has an ASCII counterpart.
+
+It would be nice if the LaTeX one could be mapped to PowerPoint's equation editor (Gabor).
 
 ## Existing notations
 
