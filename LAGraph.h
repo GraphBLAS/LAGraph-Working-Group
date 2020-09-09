@@ -251,7 +251,6 @@ typedef enum    // we need an LAGraph_Info
     // success, but ...:
     GrB_SUCCESS = 0,            // all is well
     GrB_NO_VALUE = 1,           // A(i,j) requested but not there
-    LAGraph_something_else = 101,
 
     // API errors:
     GrB_UNINITIALIZED_OBJECT = 2,   // object has not been initialized
@@ -272,7 +271,9 @@ typedef enum    // we need an LAGraph_Info
                                     // used for indices in a list of indices.
     GrB_PANIC = 13                  // unknown error, or GrB_init not called.
 }
-LAGraph_info ;
+GrB_Info ;
+
+GrB_Matrix_error (&s, A) ;
 
             // later: or not at all:
             // GrB_Info LAGraph_ShortestPath_SingleSourceSingleDestination
@@ -280,6 +281,8 @@ LAGraph_info ;
 
 GrB_Info LAGraph_ShortestPath_AllPairs
 (
+    // input/output:
+    LAGraph_Info *info,
     // output:
     GrB_Matrix *Distance,
     GrB_Matrix *Parent,
@@ -291,6 +294,30 @@ GrB_Info LAGraph_ShortestPath_AllPairs
 // Dist, Parent undefined on input, created on output, just like GrB_Matrix_new
 info = LAGraph_something (&Dist, &Parent, NULL, G) ;
 
+//------------------------------------------------------------------------------
+
+    LAGraph_Info lginfo ;   // fixed size, no malloc
+
+    typedef struct
+    {
+        int64_t info ;     // algorithm specific, warning > 0, ok 0, err<0
+        char message [120] ;
+    }
+    LAGraph_Info ;
+
+    LAGraph_ShortestPath_AllPairs (Dis, Pa, Hop, G, NULL) ;
+    i = LAGraph_utility (stuff, G, NULL) ;    // no LAGraph_Info needed
+
+    GrB_Info info = LAGraph_ShortestPath_AllPairs (Dis, Pa, Hop, G, &lginfo) ;
+    if (info != GrB_SUCCESS) 
+    {
+        printf ("oops %d:%s\n", lginfo.info, lginfo.message) ;
+    }
+
+    GrB_Info info = LAGraph_BFS (&level, source, G) ;
+
+
+    
 //------------------------------------------------------------------------------
 // what's next?
 //------------------------------------------------------------------------------
