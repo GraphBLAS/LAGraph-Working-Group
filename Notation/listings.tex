@@ -1,0 +1,50 @@
+\usepackage{microtype}
+\renewcommand*\ttdefault{txtt}
+
+\usepackage{listings}
+
+\usepackage{textcomp}
+\lstset{upquote=true}
+
+\definecolor{keyword}{HTML}{2771a3}
+\definecolor{pattern}{HTML}{b53c2f}
+\definecolor{string}{HTML}{be681c}
+\definecolor{relation}{HTML}{7e4894}
+\definecolor{variable}{HTML}{107762}
+\definecolor{comment}{HTML}{8d9094}
+
+\lstset{
+	%numbers=left,
+	numbers=none,
+	stepnumber=1,
+	numbersep=5pt,
+	%basicstyle=\scriptsize\ttfamily,
+	basicstyle=\footnotesize\ttfamily,
+	keywordstyle=\color{keyword}\bfseries\ttfamily,
+	commentstyle=\color{comment}\ttfamily,
+	stringstyle=\color{string}\ttfamily,
+	identifierstyle=,
+	showstringspaces=false,
+	aboveskip=3pt,
+	belowskip=3pt,
+	columns=flexible,
+	keepspaces=true,
+	breaklines=true,	
+	captionpos=b,
+	tabsize=2,
+	frame=single,
+}
+
+% see https://github.com/GraphBLAS/GrAPL19/blob/master/langsupport.tex
+\lstdefinelanguage{Pythoncustom}
+{%columns=fullflexible,
+escapeinside={/*@}{@*/},breaklines=true,breakatwhitespace=true,%
+basicstyle=\color{lightblue},keywordstyle=,%
+lineskip=-.05\baselineskip,%morekeywords={}%pattern,in,is,to,from,out_edges,adj,once,fixed_point,vertex_property,edge_property,vertex,edge,meta,auto,concept,requires,concept_map},%
+alsolanguage=Python,
+literate = %
+  {\{}{\smaller{$\{$}}{1}%
+  {\}}{\smaller{$\}$}}{1}%
+  {<=}{$\leq$}{1}%
+  {-}{--}{1}%
+}

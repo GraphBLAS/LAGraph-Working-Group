@@ -1,0 +1,30 @@
+\begin{algorithm}[htb]
+	\label{alg:sssp-delta-stepping}
+	\caption{Delta-stepping SSSP.}
+	\KwData{\;
+		$\quad \grbm{A}, \grbm{A_H}, \grbm{A_L} \in \grbmatrixtype{\grbfloat}{}{\grbcnt{V}}{\grbcnt{V}} $ \;
+		$\quad \grbs{s}, \grbs{i} \in \grbscalartype{\grbuint}{} $ \;
+		$\quad \Delta \in \grbscalartype{\grbfloat}{} $ \;
+		$\quad \grbv{t}, \grbv{t_{Req}} \in \grbvectortype{\grbfloat}{}{\grbcnt{V}} $ \;
+		$\quad \grbv{t_{B_i}}, \grbv{e} \in \grbvectortype{\grbuint}{}{\grbcnt{V}} $ \; % e was S in the original paper, changed to lowercase for consistency
+	}
+	%\KwResult{...}
+	\Fn{DeltaStepping}{
+		$\grbm{A_L} = \grbselect{0 < \grbm{A} \leq \Delta} $ \;
+		$\grbm{A_H} = \grbselect{\Delta < \grbm{A}} $ \;
+		$\grbv{t}(:) = \infty $ \;
+		$\grbv{t}(\grbs{s}) = 0 $ \;
+		\While{$\grbnvals{\grbselect{\grbs{i} \Delta \leq \grbv{t}}} \neq 0$}{
+			$\grbs{s} = 0 $ \;
+			$\grbv{t_{B_i}} = \grbselect{\grbs{i} \Delta \leq \grbv{t} < (\grbs{i} + 1) \Delta}$ \;
+			\While{$\grbv{t_{B_i}} \neq 0$}{
+				$\grbv{t_{Req}} = \grbm{A_L\grbt} \grbplustimes (\grbv{t} \grbtimes \grbv{t_{B_i}})$ \;
+				$\grbv{e} = \grbselect{0 < \grbv{e} \grbplus \grbv{t_{B_i}} }$ \;
+				$\grbv{t_{B_i}} = \grbselect{\grbs{i} \Delta \leq \grbv{t_{Req}} < (\grbs{i} + 1) \Delta} \grbtimes (\grbv{t_{Req}} \grbbinaryop{\underset{\grbplus}{\grbmin}} \grbv{t} ) $\;
+			}
+			$\grbv{t_{Req}} = \grbm{A_H\grbt} \grbplustimes (\grbv{t} \grbtimes \grbv{e})$ \;
+			$\grbv{t} = \grbv{t} \grbmin \grbv{t_{Req}}$ \;
+			$\grbs{i} = \grbs{i} + 1 $ \;
+	}
+	}
+\end{algorithm}

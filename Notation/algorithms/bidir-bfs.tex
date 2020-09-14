@@ -1,0 +1,45 @@
+\begin{algorithm}[htb]
+	\footnotesize
+	\caption{Bidirectional BFS algorithm.}
+	\label{alg:GraphBLAS:bidirectional}
+	\begin{algorithmic}[1]
+		\Procedure{BidirectionalBFS}{$\grbm{A}, v_1, v_2$}
+		\Input:
+			$\grbm{A} \in \grbbool^{n \times n}; v_1, v_2 \in \grbnat$
+		\EndInput
+		\Data: 
+		$\grbfrontieri, \grbfrontierii,
+		 \grbnexti, \grbnextii,
+		 \grbseeni, \grbseenii
+		 \in \grbbool^n$
+		\EndData
+		\Output: $\textit{length} \in \grbnat$ \Comment{length of unweighted shortest path}
+		\EndOutput
+
+		\If{$v_1 = v_2$}
+			\Return 0
+		\EndIf
+
+		\State $\grbfrontieri,  \grbseeni  \grbassign \{ [v_1], [\texttt{true}] \}$
+		\State $\grbfrontierii, \grbseenii \grbassign \{ [v_2], [\texttt{true}] \}$
+
+		\For{$\textit{level} = 1$ \textbf{to} $\lceil n/2 \rceil$}
+			\State $\grbnexti\grbmask{\neg\grbseeni} = \grbA \grblorland \grbfrontieri$
+			\If {$\grbnexti$ is empty} \Return no path found \EndIf
+			\If {$\grbnexti \grbland \grbnextii$ is not empty} \Return $2 \times \textit{level} - 1$ \EndIf
+
+			\State $\grbnextii\grbmask{\neg\grbseenii} = \grbA \grblorland \grbfrontierii$
+			\If {$\grbnextii$ is empty} \Return no path found \EndIf
+			\If {$\grbnexti \grbland \grbnextii$ is not empty} \Return $2 \times \textit{level}$ \EndIf
+
+			\State
+				$\grbseeni = \grbseeni \grblor \grbnexti$
+			\State
+				$\grbseenii = \grbseenii \grblor \grbnextii$
+			
+			\State $\grbfrontieri = \grbnexti$
+			\State $\grbfrontierii = \grbnextii$
+		\EndFor
+		\EndProcedure
+		\end{algorithmic}
+\end{algorithm}

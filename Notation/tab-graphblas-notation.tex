@@ -1,0 +1,104 @@
+\setlength{\tabcolsep}{1.9pt}
+%\renewcommand\arraystretch{0.85}
+
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{llr@{}l}
+        \toprule
+        \multicolumn{1}{c}{\bf op./method} & \multicolumn{1}{c}{\bf name}                                              & \multicolumn{2}{c}{\bf notation}                                                                                                                                                             \\
+        \midrule
+        \tt mxm                                  & matrix-matrix multiplication                                              & $\grbm{C} \grbmask{\grbm{M}}        $                                                                  & $\grbaccumeq{} \grbm{A} \grbplustimes \grbm{B}$                                     \\
+        \tt vxm                                  & vector-matrix multiplication                                              & $\grbv{\grbv{w}} \grbmask{\grbv{m}} $                                                                  & $\grbaccumeq{} \grbv{u} \grbplustimes \grbm{A}$                                     \\
+        \tt mxv                                  & matrix-vector multiplication                                              & $\grbv{w} \grbmask{\grbv{m}}        $                                                                  & $\grbaccumeq{} \grbm{A} \grbplustimes \grbv{u}$                                     \\
+        \midrule
+        \multirow{2}{*}{\tt eWiseAdd}            & element-wise addition                                                     & $\grbm{C} \grbmask{\grbm{M}} $                                                                         & $\grbaccumeq{} \grbm{A} \grbplus \grbm{B}$                                          \\
+                                                 & set union of patterns                                                     & $\grbv{w} \grbmask{\grbv{m}} $                                                                         & $\grbaccumeq{} \grbv{u} \grbplus \grbv{v}$                                          \\
+        \midrule
+        \multirow{2}{*}{\tt eWiseMult}           & element-wise multiplication                                               & $\grbm{C} \grbmask{\grbm{M}} $                                                                         & $\grbaccumeq{} \grbm{A} \grbtimes \grbm{B}$                                         \\
+                                                 & set intersection of patterns                                              & $\grbv{w} \grbmask{\grbv{m}} $                                                                         & $\grbaccumeq{} \grbv{u} \grbtimes \grbv{v}$                                         \\
+        \midrule
+        \multirow{4}{*}{\tt extract}             & extract submatrix                                                         & $\grbm{C} \grbmask{\grbm{M}} $                                                                         & $\grbaccumeq{} \grbm{A}(\grba{I}, \grba{J})$                                        \\
+                                                 & extract column vector                                                     & $\grbv{w} \grbmask{\grbv{m}} $                                                                         & $\grbaccumeq{} \grbv{A}(:, \grbs{j})$                                               \\
+                                                 & extract row vector                                                        & $\grbv{w} \grbmask{\grbv{m}} $                                                                         & $\grbaccumeq{} \grbv{A}(\grbs{i}, :)$                                               \\
+                                                 & extract subvector                                                         & $\grbv{w} \grbmask{\grbv{m}} $                                                                         & $\grbaccumeq{} \grbv{u}(\grba{I})$                                                  \\
+        \midrule
+        \multirow{4}{*}{\tt assign}              & assign matrix to submatrix with mask for $\grbm{C}$                       & $\grbm{C} \grbmask{\grbm{M}} (\grba{I},\grba{J}) $                                                     & $\grbaccumeq{} \grbm{A}$                                                            \\
+                                                 & assign scalar to submatrix with mask for $\grbm{C}$                       & $\grbm{C} \grbmask{\grbm{M}} (\grba{I},\grba{J}) $                                                     & $\grbaccumeq{} \grbs{s}$                                                            \\
+                                                 & assign vector to subvector with mask for $\grbv{w}$                       & $\grbv{w} \grbmask{\grbv{m}} (\grba{I}) $                                                              & $\grbaccumeq{} \grbv{u}$                                                            \\
+                                                 & assign scalar to subvector with mask for $\grbv{w}$                       & $\grbv{w} \grbmask{\grbv{m}} (\grba{I}) $                                                              & $\grbaccumeq{} \grbs{s}$                                                            \\
+        \midrule
+        \multirow{4}{*}{\tt subassign (GxB)}     & assign matrix to submatrix with submask for $\grbm{C}(\grba{I},\grba{J})$ & $\grbm{C}(\grba{I},\grba{J}) \grbmask{\grbm{M}} $                                                      & $\grbaccumeq{} \grbm{A}$                                                            \\
+                                                 & assign scalar to submatrix with submask for $\grbm{C}(\grba{I},\grba{J})$ & $\grbm{C}(\grba{I},\grba{J}) \grbmask{\grbm{M}} $                                                      & $\grbaccumeq{} \grbs{s}$                                                            \\
+                                                 & assign vector to subvector with submask for $\grbv{w}(\grba{I})$          & $\grbv{w}(\grba{I}) \grbmask{\grbv{m}} $                                                               & $\grbaccumeq{} \grbv{u}$                                                            \\
+                                                 & assign scalar to subvector with submask for $\grbv{w}(\grba{I})$          & $\grbv{w}(\grba{I}) \grbmask{\grbv{m}} $                                                               & $\grbaccumeq{} \grbs{s}$                                                            \\
+        \midrule
+        \multirow{2}{*}{\tt apply}               & \multirow{2}{*}{apply unary operator}                                     & $\grbm{C} \grbmask{\grbm{M}} $                                                                         & $\grbaccumeq{} \grbf{f}{\grbm{A}}$                                                  \\
+                                                 &                                                                           & $\grbv{w} \grbmask{\grbv{m}} $                                                                         & $\grbaccumeq{} \grbf{f}{\grbv{u}}$                                                  \\
+        \midrule
+        \multirow{4}{*}{\tt select (GxB)}        & \multirow{4}{*}{apply select operator}                                    & $\grbm{C} \grbmask{\grbm{M}} $                                                                         & $\grbaccumeq{} \grbselect{\grbm{A}, \grbf{f}{\grbs{k}}}$                            \\
+                                                 &                                                                           & $\grbm{C} \grbmask{\grbm{M}} $                                                                         & $\grbaccumeq{} \grbselect{\grbs{low} \leq \grbm{A} \leq \grbs{up}}$                 \\
+                                                 &                                                                           & $\grbv{w} \grbmask{\grbv{m}} $                                                                         & $\grbaccumeq{} \grbselect{\grbv{u}, \grbf{f}{\grbs{k}}}$                            \\
+                                                 &                                                                           & $\grbv{w} \grbmask{\grbv{m}} $                                                                         & $\grbaccumeq{} \grbselect{\grbs{low} \leq \grbv{u} \leq \grbs{up}}$                 \\
+        \midrule
+        \multirow{3}{*}{\tt reduce}              & reduce matrix to column vector                                            & $\grbv{w} \grbmask{\grbv{m}} $                                                                         & $\grbaccumeq{} \grbreduce{\grbplus}{\grbs{j}}{\grbm{A}}{\grbs{:},\grbs{j}}$         \\
+                                                 & reduce matrix to scalar                                                   & $\grbs{s} $                                                                                            & $\grbaccumeq{} \grbreduce{\grbplus}{\grbs{i}\grbs{j}}{\grbm{A}}{\grbs{i},\grbs{j}}$ \\
+                                                 & reduce vector to scalar                                                   & $\grbs{s} $                                                                                            & $\grbaccumeq{} \grbreduce{\grbplus}{\grbs{i}}{\grbm{u}}{\grbs{i}}$                  \\
+        \midrule
+        \multirow{1}{*}{\tt transpose}           & transpose                                                                 & $\grbm{C} \grbmask{\grbm{M}} $                                                                         & $\grbaccumeq{} \grbm{A}\grbt$                                                       \\
+        \midrule
+        \tt kronecker                            & Kronecker multiplication                                                  & $\grbm{C} \grbmask{\grbm{M}}$                                                                          & $\grbaccumeq{} \grbkron{\grbm{A}, \grbm{B}}$                                        \\
+        \midrule\midrule % operations above, methods below
+        \multirow{2}{*}{\tt new}                 & new matrix                                                                & \multicolumn{2}{l}{$\grbnewmatrix{\grbm{A}}{\grbplaceholder{TYPE}}{\grbplaceholder{PRECISION}}{n}{m}$}                                                                                       \\
+                                                 & new vector                                                                & \multicolumn{2}{l}{$\grbnewvector{\grbv{u}}{\grbplaceholder{TYPE}}{\grbplaceholder{PRECISION}}{n}$}                                                                                          \\
+        \midrule
+        \multirow{2}{*}{\tt build}               & matrix from tuples                                                        & $\grbm{C}\ $                                                                                           & $\grbassign \left\{ \grba{I}, \grba{J}, \grba{X} \right\} $                         \\
+                                                 & vector from tuples                                                        & $\grbv{w}\ $                                                                                           & $\grbassign \left\{ \grba{I}, \grba{X} \right\} $                                   \\
+        \midrule
+        \multirow{2}{*}{\tt extractTuples}       & \multirow{2}{*}{extract index/value arrays}                               & $ \left\{ \grba{I}, \grba{J}, \grba{X} \right\} $                                                      & $\grbassign \grbm{A} $                                                              \\
+                                                 &                                                                           & $ \left\{ \grba{I}, \grba{X} \right\} $                                                                & $\grbassign \grbv{u}   $                                                            \\
+        \midrule
+        \multirow{2}{*}{\tt dup}                 & duplicate matrix                                                          & $\grbm{C} $                                                                                            & $\grbassign \grbm{A}$                                                               \\
+                                                 & duplicate vector                                                          & $\grbv{w} $                                                                                            & $\grbassign \grbv{u}$                                                               \\
+        \midrule
+        \multirow{2}{*}{\tt extractElement}      & \multirow{2}{*}{extract scalar element}                                   & $\grbs{s} $                                                                                            & $\ = \grbm{A}(\grbs{i}, \grbs{j})$                                                  \\
+                                                 &                                                                           & $\grbs{s} $                                                                                            & $\ = \grbv{u}(\grbs{i})$                                                            \\
+        \midrule
+        \multirow{2}{*}{\tt setElement}          & \multirow{2}{*}{set element}                                              & $\grbm{C}(\grbs{i}, \grbs{j}) $                                                                        & $\ = \grbs{s}$                                                                      \\
+                                                 &                                                                           & $\grbv{w}(\grbs{i})$                                                                                   & $\ = \grbs{s}$                                                                      \\
+        \bottomrule
+    \end{tabular}
+    \caption{GraphBLAS operations and methods based on \cite{DBLP:journals/toms/Davis19}.
+        \emph{Notation:}
+        Matrices and vectors are typeset in bold, starting with uppercase ($\grbm{A}$) and lowercase ($\grbv{u}$) letters, respectively.
+        Scalars including indices are lowercase italic ($\grbs{s}$, $\grbs{i}$, $\grbs{j}$) while arrays are uppercase italic ($\grba{X}$, $\grba{I}$, $\grba{J}$).
+        $\grbplus$ and $\grbtimes$ are the addition and multiplication operators forming a semiring and default to conventional arithmetic $+$ and $\times$ operators.
+        $\grbapply$ is the apply operator.
+        Masks~$ \grbmask{\grbm{M}}$ and $\grbmask{\grbv{m}} $ are used to selectively write to the result matrix/vector. The complements of masks $\grbmask{\grbm{M}}$,
+        $\grbmask{\grbv{m}}$
+        can be selected with the negation symbol, denoted with
+        $\grbmask{\grbneg \grbm{M}},$
+        $\grbmask{\grbneg \grbv{m}}$,
+        respectively.
+        Masks
+        with ``replace'' semantics (annihilating all elements outside the mask)
+        are denoted with
+        $\grbmaskreplace{\grbm{M}}$,
+        $\grbmaskreplace{\grbneg \grbm{M}}$,
+        $\grbmaskreplace{\grbv{m}}$, and
+        $\grbmaskreplace{\grbneg \grbv{m}}$,
+        The structure of the mask is denoted with
+        $\grbmask{\grbstr{\grbm{M}}}$,
+        $\grbmask{\grbneg \grbstr{\grbm{M}}}$,
+        $\grbmask{\grbstr{\grbv{m}}}$, and
+        $\grbmask{\grbneg \grbstr{\grbv{m}}}$.
+    }
+    \label{tab:graphblas-notation}
+\end{table}
+
+% eWiseAdd add with union symbol
+% \multirow{2}{*}{\tt eWiseAdd}  & element-wise,           & $\grbm{C} \grbmask{\grbm{M}} $&$\ = (\grbm{A} \grbeWiseAdd\oplus  \grbm{B})$ \\
+%                      & set union               & $\grbv{w} \grbmask{\grbv{m}} $&$\ = (\grbv{u} \grbeWiseAdd\oplus  \grbv{v})$ \\
+% \midrule
+% eWiseMult with union symbol
+% \multirow{2}{*}{\tt eWiseMult} & element-wise,           & $\grbm{C} \grbmask{\grbm{M}} $&$\ = (\grbm{A} \grbeWiseMult\otimes \grbm{B})$ \\
+%                      & set intersection        & $\grbv{w} \grbmask{\grbv{m}} $&$\ = (\grbv{u} \grbeWiseMult\otimes \grbv{v})$ \\

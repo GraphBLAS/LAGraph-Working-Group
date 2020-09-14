@@ -1,0 +1,53 @@
+
+name: Build LaTeX document
+on: [push]
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v1
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@master
+        with:
+          root_file: ms.tex
+      - name: Rename file and turn on colored mode
+        run: |
+          mv ms.pdf lagraph.pdf
+          touch colored.tex
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@master
+        with:
+          root_file: ms.tex
+      - name: Rename file and turn on ascii mode
+        run: |
+          mv ms.pdf lagraph-colored.pdf
+          touch ascii.tex
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@master
+        with:
+          root_file: ms.tex
+      - name: Rename file and turn off colored mode
+        run: |
+          mv ms.pdf lagraph-ascii-colored.pdf
+          rm colored.tex
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@master
+        with:
+          root_file: ms.tex
+      - name: Install and Build 🔧
+        run: |
+          cp ms.pdf lagraph-ascii.pdf
+          mkdir build
+          mv lagraph*.pdf build/
+          mv README.md build/
+      - name: Install SSH Client 🔑
+        uses: webfactory/ssh-agent@v0.2.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          SSH: true
+          BRANCH: compiled-pdf
+          FOLDER: build

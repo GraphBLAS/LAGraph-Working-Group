@@ -1,0 +1,14 @@
+\begin{algorithm}[htb]
+	\label{alg:sssp-bf-basic}
+	\caption{Algebraic Bellman-Ford for SSSP.}
+	%\KwData{...}
+	%KwResult{...}
+	\Fn{SSSP}{
+		$\grbv{d}(\grbs{s}) = 0$ \;
+		\For{$\grbs{k} = 1$ \KwTo $\grbs{n}-1$}{
+			$\grbv{dtmp} = \grbv{d} \grbminplus \grbm{A}$ \;
+			\If{$\grbv{dtmp} = \grbv{d}$}{\Break}
+			$\grbv{d} \grbassign \grbv{dtmp}$ \;
+		}
+	}
+\end{algorithm}

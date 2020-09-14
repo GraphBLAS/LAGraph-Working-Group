@@ -1,0 +1,35 @@
+\begin{algorithm}[htb]
+	\label{alg:bfs}
+	\caption{Breadth-first search.}
+	%\KwData{...}
+	%\KwResult{...}
+	\Fn{BFS}{
+		$\grbfrontier(\grbsource) = \grbtrue$ \;
+		\For{$\grblevel = 1$ \KwTo $\grbs{n}-1$}{
+			$\grbseen \grbmask{\grbfrontier} = \grblevel$ \;
+			$\grbfrontier \grbmaskreplace{\grbneg \grbseen} = \grbfrontier \grbanypair \grbmA$ \;
+		}
+	}
+\end{algorithm}
+
+\begin{algorithm}[htb]
+	\label{alg:bfs}
+	\caption{Breadth-first search (push/pull).}
+	%\KwData{...}
+	%\KwResult{...}
+	\Fn{BFS}{
+		$\grbfrontier(\grbsource) = \grbtrue$ \;
+		\For{$\grblevel = 1$ \KwTo $\grbs{n}-1$}{
+			$\grbseen \grbmask{\grbfrontier} = \grblevel$ \;
+			
+			$\grbs{push} = \text{use some heuristics to determine whether to push/pull} \;$
+
+			\If{$\grbs{push}$}{
+				$\grbfrontier \grbmaskreplace{\grbneg \grbseen} = \grbfrontier \grbanypair \grbmA$ \;
+			}
+			\Else{
+				$\grbfrontier \grbmaskreplace{\grbneg \grbseen} = \grbmA \grbanypair \grbfrontier$ \;
+			}
+		}
+	}
+\end{algorithm}

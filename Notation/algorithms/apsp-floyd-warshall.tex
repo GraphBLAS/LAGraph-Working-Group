@@ -1,0 +1,12 @@
+\begin{algorithm}[htb]
+	\label{alg:apsp-floyd-warshall}
+	\caption{All-pairs shortest path (Floyd--Warshall algorithm).}
+	%\KwData{...}
+	%\KwResult{...}
+	\Fn{FloydWarshall}{
+		$\grbm{D} \grbassign \grbm{A}$ \;
+		\For{$\grbs{k} = 1$ \KwTo $\grbs{n}$}{
+            $\grbm{D} = \grbm{D} \grbmin [\grbm{D}(:, \grbs{k}) \grbminplus (\grbm{D}(\grbs{k}, :)]$ \;
+        }
+	}
+\end{algorithm}

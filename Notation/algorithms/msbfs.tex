@@ -1,0 +1,14 @@
+\begin{algorithm}[htb]
+	\label{alg:msbfs}
+	\caption{Multi-source breadth-first search.}
+	\DontPrintSemicolon
+	\KwData{...}
+	\KwResult{...}
+	\Fn{MSBFS}{
+		$\grbFrontier \grbassign \mathsf{diag}(\grba{S}, \grbs{n})$ \;
+		\For{$\grblevel = 1$ \textbf{to} $n-1$}{
+			$\grbSeen\grbmask{\grbFrontier} = \grblevel$ \;
+			$\grbFrontier\grbmaskreplace{\grbneg \grbSeen} = \grbFrontier \grbanypair \grbm{A} $ \;
+		}
+	}
+\end{algorithm}

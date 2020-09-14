@@ -1,0 +1,23 @@
+\begin{algorithm}[htb]
+	\label{alg:pagerank}
+	\caption{PageRank (used in Graphalytics).}
+	\KwData{$\grbs{\grbalpha}$ constant (damping factor)}
+	\KwResult{...}
+	\Fn{PageRank}{
+        $\grbv{pr}(:) = 1 / n$ \;
+        $\grbv{outdegrees} = [\grbplus_{\grbs{j}} \grbm{A}(:, \grbs{j})] $ \;
+        %$\grbv{nondangling} = [\grblor_{\grbs{j}} \grbm{A}(:, \grbs{j})] $ \;
+
+		\For{$\grbs{k} = 1$ \KwTo $\grbs{numIterations}$}{
+            $\grbv{importance} = \grbv{pr} \grbdiv \grbv{outdegrees}$ \;
+            $\grbv{importance} = \grbf{times}{\grbv{importance}, \grbs{\grbalpha}} $ \Comment*{apply the $\grbf{times}{x, s} = x \cdot s$ operator}
+            $\grbv{importance} = \grbv{importance} \grbplustimes \grbm{A} $ \;
+
+            $\grbv{danglingVertexRanks} \grbmask{\grbneg{\grbv{outdegrees}}} = \grbv{pr}(:) $ \;
+            $\grbs{totalDanglingRank} = \grbreduce{\grbplus}{\grbs{i}}{\grbv{danglingVertexRanks}(\grbs{i})} \grbtimes \grbfrac{\grbs{\grbalpha}}{n} $ \;
+
+            $\grbv{pr}(:) = \grbfrac{1-\grbs{\grbalpha}}{\grbs{n}} \grbplus \grbs{totalDanglingRank} $ \;
+            $\grbv{pr} \grbmask{\grbv{importance}} = \grbv{pr} \grbplus \grbv{importance} $ \; % not sure if the mask helps
+        }
+	}
+\end{algorithm}

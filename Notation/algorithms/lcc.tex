@@ -1,0 +1,13 @@
+\begin{algorithm}[htb]
+	\label{alg:lcc}
+	\caption{Local clustering coefficient.}
+	%\KwData{...}
+	%\KwResult{...}
+	\Fn{PageRank}{
+        $\grbm{Tri} \grbmask{\grbm{A}} = \grbm{A} \grbplustimes \grbm{A}$ \Comment*{compute triangle count matrix}
+        $\grbv{tri} = \grbreduce{\grbplus}{\grbs{j}}{\grbm{Tri}}{:, \grbs{j}}$ \Comment*{reduce to triangle count vector}
+        $\grbv{deg} = \grbreduce{\grbplus}{\grbs{j}}{\grbm{A}}{:, \grbs{j}}$ \Comment*{reduce to vertex degree vector}
+        $\grbv{wed} = \grbf{perm2}{\grbv{deg}}$ \Comment*{apply $\grbf{perm2}{x} = x \cdot (x-1)$ to get wedge count vector}
+        $\grbv{lcc} = \grbv{tri} \grbdiv \grbv{wed} $ \Comment*{LCC vector}
+	}
+\end{algorithm}

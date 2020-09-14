@@ -1,0 +1,42 @@
+\begin{algorithm}[htb]
+	\label{alg:louvain}
+	\caption{Louvain algorithm (WIP).}
+	%\KwData{...}
+	%KwResult{...}
+	\Fn{Louvain}{
+        $\grbm{G} \grbaccumeq{\grbplus} \grbm{G}\grbt $ \;
+        $\grbv{k} = \grbreduce{\grbplus}{\grbs{j}}{\grbm{A}}{:, \grbs{j}} $ \;
+        $\grbs{m} = \grbfrac{1}{2} \grbreduce{\grbplus}{\grbs{i}}{\grbv{k}}{\grbs{i}} $ \;
+        $\grbm{S} \grbassign \grbm{I} $ \; % identity
+        \;
+        $\grbs{vertices\_changed} \grbassign \grbnvals{\grbv{k}} $ \;
+        \While{$\grbs{vertices\_changed} > 0 $}{
+            \For{$\grbs{j} \in \grboperation{range}{|V|}$}{
+                $\grbv{v} = \grbm{G}(\grbs{j}, :) $ \;
+                $\grbv{t_q} = \grbv{v} \grbanypair \grbm{S} $ \;
+
+                %$\grbv{t_j} = \grbv{e_j} \grbplustimes \grbm{S} $ \;
+                $\grbv{sr} = \grbm{S}(\grbs{j}, :)$ \;
+                $\grbm{S}(\grbs{j}, :) = \mathrm{empty} $\;
+                \;
+                % (\grbv{e_j} \grbplustimes \grbm{G}) \grbplus 
+                $\grbv{q} \grbassign \grbv{k} $ \;
+                $\grbv{q}\grbmask{\grbv{k}} \grbaccumeq{\grbtimes} -\grbv{k}(\grbs{j}) / \grbs{m} $ \;
+                $\grbv{q} \grbaccumeq{\grbplus} \grbv{v} $ \;
+                $\grbv{q_1}\grbmask{\grbv{t_q}} = \grbv{q} \grbplustimes \grbm{S} $ \;
+                \;
+                $\grbv{t} = (\grbv{q_1} == \grbreduce{\grbmax}{\grbs{i}}{\grbv{q_1}}{\grbs{i}})  $ \;
+                \While{$\grbnvals{t} \neq 1$}{
+                    $\grbv{p} = \grboperation{random}{} \grbtimes \grbv{t} $ \;
+                    $\grbv{t} = (\grbv{p} == \grbreduce{\grbmax}{\grbs{i}}{\grbv{p}}{\grbs{i}}) $ \;
+                }
+                $\grbm{S}(\grbs{j}, :) = \grbv{t} $ \;
+                \;
+                \If{$\grbnvals{\grbv{sr} \grbtimes \grbv{t}} == 0 $}{
+                    $\grbs{vertices\_changed} = \grbnvals{\grbv{k}}$ \;
+                }
+                $\grbs{vertices\_changed} = \grbs{vertices\_changed} - 1$ \;
+            }
+        }
+	}
+\end{algorithm}

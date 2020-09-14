@@ -1,0 +1,43 @@
+\begin{algorithm}[htb]
+	\label{alg:bc}
+	\caption{Betweenness centrality.}
+	%\KwData{...}
+	%\KwResult{...}
+	\Fn{MSBFS}{
+		\Comment{The $\grbm{NumSp}$ structure holds the number of shortest paths for each node and starting vertex discovered so far.}
+		\Comment{Initialized to source vertices.}
+		$\grbm{NumSp} \grbassign \{ \grba{s}, [1, 1, \ldots, 1] \}$ \;
+		\Comment{The $\grbm{Frontier}$ holds the number of shortest paths for each node and starting vertex discovered so far.}
+		\Comment{Initialized to source vertices.}
+        $\grbm{Frontier} \grbmask{\grbm{NumSp}} = \grbm{A}(\grba{s}, :)$ \; %\Comment{In the original, it was $\grbm{A}\grbt(:, \grba{s})$}
+		%$\grbs{nvals} = 0$ \;
+		$\grbs{d} = 0$ \;
+		\Comment{The $\grbm{Sigmas}$ matrices store frontier information for each level of the BFS phase.}
+		%\Comment{The memory for an entry in \grbm{Sigmas} is only allocated within the loop if needed.}
+		\Comment{BFS phase (forward sweep)}
+		\Do{$\grbnvals{\grbFrontier} > 0$}{
+			\Comment{$\grbm{Sigmas}[\grbs{d}](:, \grbs{s}) = \grbs{d}^{\textrm{th}}$ level frontier from source vertex $\grbs{s}$}
+			$\grbnewmatrix{\grbm{Sigmas}[\grbs{d}]}{\grbbool}{}{\grbs{n}}{\grbs{nsver}} $ \;
+			$\grbm{Sigmas}[\grbs{d}](:, :) = \grbm{Frontier} $ \Comment*{Convert matrix to Boolean} % the '(:, :)' is there to express 'assign' instead of 'dup'
+			$\grbm{NumSp} = \grbm{NumSp} \grbplus \grbm{Frontier}$ \Comment*{Accumulate path counts}
+			$\grbm{Frontier}\grbmaskreplace{\grbm{NumSp}} = \grbm{A}\grbt \grbplustimes \grbm{Frontier}$ \Comment*{Update frontier}
+		}
+		$\grbnewmatrix{\grbm{NumSpInv}}{\grbfloat}{32}{\grbs{n}}{\grbs{nsver}}$ \;
+		$\grbm{NumSpInv} = 1.0 \grbdiv \grbm{NumSp}$ \;
+
+		$\grbnewmatrix{\grbm{BCU}}{\grbfloat}{32}{\grbs{n}}{\grbs{nsver}}$ \;
+		$\grbm{BCU}(:) = 1.0$ \Comment*{Make $\grbm{BCU}$ dense, initialize all elements to $1.0$}
+		$\grbnewmatrix{\grbm{W}}{\grbfloat}{32}{\grbs{n}}{\grbs{nsver}}$ \;
+
+		\Comment{Tally phase (backward sweep)}
+		\For{$\grbs{i} = \grbs{d} - 1$ \KwDownto $0$}{
+			$\grbm{W}\grbmaskreplace{\grbm{Sigmas}[\grbs{i}]} = \grbm{NumSpInv} \grbdiv \grbm{BCU}$ \;
+			$\grbm{W}\grbmaskreplace{\grbm{Sigmas}[\grbs{i} - 1]} = \grbm{A} \grbplustimes \grbm{W}$ \Comment*{Add contributions by successors and mask with that BFS level's frontier.}
+			$\grbm{BCU} \grbaccumeq{\grbplus} \grbm{W} \grbtimes \grbm{NumSp}$ \;
+		}
+
+		\Comment{Row reduce $\grbm{BCU}$ and subtract $\grbs{nsver}$ from every entry to account for 1 extra value per $\grbm{BCU}$ row element}
+		$\grbv{delta} = \grbreduce{\grbplus}{\grbs{j}}{\grbm{BCU}}{:, \grbs{j}} $ \;
+		$\grbv{delta} \grbaccumeq{\grbminus} \grbs{nsver}$ \; % use '-\!\!=' ?
+	}
+\end{algorithm}

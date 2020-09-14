@@ -1,0 +1,40 @@
+\begin{algorithm}[htb]
+	\label{alg:triangle-count-cohen}
+	\caption{Triangle count (Cohen's algorithm).}
+	%\KwData{...}
+	%\KwResult{...}
+	\Fn{TriangleCount}{
+		$\grbm{L} = \grbtril{\grbm{A}}$ \;
+		$\grbm{U} = \grbtriu{\grbm{A}}$ \;
+		$\grbm{B} = \grbm{L} \grbplustimes \grbm{U}$ \;
+		$\grbm{C} = \grbm{B} \grbtimes \grbm{A}$ \;
+		$\grbs{t} = \grbreduce{\grbplus}{\grbs{i}\grbs{j}}{\grbm{C}}{\grbs{i}, \grbs{j}} / 2$ \;
+	}
+\end{algorithm}
+
+\begin{algorithm}[htb]
+	\label{alg:triangle-count-sandia}
+	\caption{Triangle count (Sandia).}
+	%\KwData{...}
+	%\KwResult{...}
+	\Fn{TriangleCount}{
+		$\grbm{L} = \grbtril{\grbm{A}}$ \;
+		$\grbm{C}\grbmask{\grbm{L}} = \grbm{L} \grbplustimes \grbm{L}$ \;
+		$\grbs{t} = \grbreduce{\grbplus}{\grbs{i}\grbs{j}}{\grbm{C}}{\grbs{i}, \grbs{j}}$ \;
+	}
+\end{algorithm}
+
+\begin{algorithm}[htb]
+	\label{alg:triangle-count-flame}
+	\caption{Triangle count (FLAME).}
+	%\KwData{...}
+	%\KwResult{...}
+	\Fn{TriangleCountFlame}{
+		\For{$\grbs{i} = 2$ \KwTo $\grbs{n}-1$}{
+			$\grbm{A_{20}} = \grbm{A}(\grbrange{\grbs{i}+1}{\grbs{n}}, \grbrange{0}{\grbs{i}-1})$ \;
+			$\grbv{a_{10}} = \grbm{A}(\grbrange{0}{\grbs{i}-1}, \grbs{i})$ \;
+			$\grbv{a_{12}} = \grbm{A}(\grbs{i}, \grbrange{\grbs{i}+1}{\grbs{n}})$ \;
+			$\grbv{t} \grbaccumeq{\grbplus} \grbv{a_{10}} \grbplustimes \grbm{A_{20}} \grbplustimes \grbv{a_{12}} $ \;
+		}
+	}
+\end{algorithm}

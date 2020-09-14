@@ -1,0 +1,16 @@
+\section{Notation}
+
+\input{tab-graphblas-notation}
+
+\autoref{tab:graphblas-notation} contains the notation of \grb operations
+
+Additionally, we use $\grbm{D} = \grbdiag{\grba{J}, \grbs{n}}$ to construct a diagonal matrix $\grbm{D} \grbassign \{ \grba{J}, \grba{J}, [1, 1, \ldots, 1] \}$. The elements of the matrix are $\grbm{D}(\grbs{j}, \grbs{j}) = 1$ for $\grbs{j} \in \grba{J}$.
+
+Initializing scalars, vectors, and matrices (GraphBLAS methods):
+
+\begin{itemize}
+    \item $\grbnewscalar{\grbss}{\grbfloat}{64}$
+    \item $\grbnewvector{\grbvu}{\grbfloat}{32}{n}$
+    \item $\grbnewmatrix{\grbmA}{\grbuint}{16}{m}{n}$
+    \item $\grbnewmatrix{\grbmA}{\grbint}{64}{k}{m}$
+\end{itemize}

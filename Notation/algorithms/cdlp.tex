@@ -1,0 +1,21 @@
+\begin{algorithm}[htb]
+	\label{alg:cdlp}
+	\caption{Community detection using label propagation (for undirected graphs).}
+	%\KwData{...}
+	%KwResult{...}
+	\Fn{CDLP}{
+        $\grbm{L} \grbassign \grbdiag{[0, 1, \ldots, \grbs{n}-1]}$ \;
+        \For{$\grbs{k} = 1$ \KwTo $\grbs{t}$}{
+            $\grbm{F} = \grbm{A} \grbsemiringops{\grbany}{\grbsecond} \grbm{L} $ \Comment*{Frequency matrix}
+            % \For{$\grbs{i} = 1$ \KwTo $\grbs{n}$}{
+            %     $\grbv{r} = \grbm{F}(\grbs{i}, :)$ \;
+            %     $\grboperation{sort}{\grbv{r}}$ \;
+            %     $\grbm{L}(\grbs{i}) = \grboperation{select\_min\_mode}{\grbv{r}}$ \;
+            % }
+            $\{\grba{I}, \grbdontcare, \grba{X}\} \grbassign \grbm{F} $ \;
+            $\grboperation{merge\_sort\_pairs}{\grba{I}, \grba{X}}$ \;
+            \(\grbv{labels} = \text{for each row in $\grba{I}$, select min mode value from $\grba{X}$}\) \;
+        }
+        %$\grbv{labels} = \grboperation{diag^{-1}}{\grbm{L}}$ \;
+	}
+\end{algorithm}

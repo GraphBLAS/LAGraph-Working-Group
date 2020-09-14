@@ -1,0 +1,230 @@
+\hyphenation{Suite-Sparse}
+\hyphenation{Graph-BLAS}
+\hyphenation{Suite-Sparse-Graph-BLAS}
+
+\newcommand{\suitesparse}{SuiteSparse\xspace}
+\newcommand{\grb}{GraphBLAS\xspace}
+\newcommand{\ssgrb}{SuiteSparse:GraphBLAS\xspace}
+\newcommand{\gxb}{\ssgrb}
+\newcommand{\lagraph}{LAGraph\xspace}
+\newcommand{\pygrb}{pygraphblas\xspace}
+
+% Define new boolean flags using etoolbox ('\newbool' is similar to '\newtoggle').
+% This workaround is needed as simply putting the newcommands inside 'IfFileExists' did not do the job
+% as it broke with 'Illegal parameter number in definition of \reserved@a', a symptom probably caused
+% by the lack of protection (\protect). Anyways, the workaround is actually cleaner.
+
+%\newcommand{\grbreduce}[2]{\left[{#1}_j \, {#2}(:, j) \right]}
+\ifbool{ascii}{
+    \newcommand{\grbm}[1]{{\ifbool{colored}{\color{brown}}{}{\mathtt{#1}}}}% matrix
+    \newcommand{\grbv}[1]{{\ifbool{colored}{\color{lilac}}{}{\mathtt{#1}}}}% vector
+    \newcommand{\grba}[1]{{\ifbool{colored}{\color{gray}}{}{\mathtt{#1}}}}% array
+    \newcommand{\grbs}[1]{{\ifbool{colored}{\color{blue}}{}{\mathtt{#1}}}}% scalar
+
+    \newcommand{\grbstr}[1]{{\{#1\}}}
+    \newcommand{\grbmask}[1]{<\! #1 \!>}
+    \newcommand{\grbmaskreplace}[1]{<\!<\! #1 \!>\!>}
+    \newcommand{\grbneg}{\texttt{!}}
+    \newcommand{\grbassign}{\mathrel{\texttt{<-}}}
+    \newcommand{\grbf}[2]{\texttt{#1}(#2)}
+    \newcommand{\grbreduce}[4]{[ {#1 #3} ]} % omit the indices
+    \newcommand{\grbt}{\texttt{'}} % transpose
+    \newcommand{\grbdiv}{\grbbinaryop{DIV}}
+    \newcommand{\grbminus}{\grbbinaryop{MINUS}}
+    \newcommand{\grbaccumeq}[1]{\mathbin{\texttt{\ensuremath{\ifstrempty{#1}{+}{#1}=}}}}
+
+    \newcommand{\grbplus}{\grbbinaryop{+}}
+    \newcommand{\grbtimes}{\grbbinaryop{\times}}
+    \newcommand{\grbapply}{\grbbinaryop{\odot}}
+
+    \newcommand{\grbfrac}[2]{(#1)/(#2)}
+
+    \newcommand{\grbbool}{\mathtt{bool}} % booleans
+    \newcommand{\grbuint}{\mathtt{uint}} % unsigned integers
+    \newcommand{\grbint}{\mathtt{int}}   % integers
+    \newcommand{\grbfloat}{\mathtt{fp}}  % floats (?)
+
+    \newcommand{\grbplaceholder}[1]{\mathsf{#1}}
+
+    \newcommand{\grbscalartype}[2]{\mathtt{#1#2()}}
+    \newcommand{\grbvectortype}[3]{\mathtt{#1#2(#3)}}
+    \newcommand{\grbmatrixtype}[4]{\mathtt{#1#2(#3, #4)}}
+
+    \newcommand{\grbnewscalar}[3]{\mathtt{#1 = \grbscalartype{#2}{#3}}}
+    \newcommand{\grbnewvector}[4]{\mathtt{#1 = \grbvectortype{#2}{#3}{#4}}}
+    \newcommand{\grbnewmatrix}[5]{\mathtt{#1 = \grbmatrixtype{#2}{#3}{#4}{#5}}}
+
+    \newcommand{\grbalpha}{\mathtt{alpha}}
+    \newcommand{\grboperator}[1]{\mathtt{#1}}
+
+    \newcommand{\grbrange}[2]{#1:#2}
+    \newcommand{\grbdontcare}{\_}
+}{ % LaTeX mode
+    \newcommand{\grbm}[1]{{\ifbool{colored}{\color{brown}}{}{\mathbf{#1}}}}% matrix
+    \newcommand{\grbv}[1]{{\ifbool{colored}{\color{lilac}}{}{\mathbf{#1}}}}% vector
+    \newcommand{\grba}[1]{{\ifbool{colored}{\color{gray}}{}{\mathit{#1}}}}% array
+    \newcommand{\grbs}[1]{{\ifbool{colored}{\color{blue}}{}{\mathit{#1}}}}% scalar
+
+    \newcommand{\grbstr}[1]{{\{#1\}}}
+    \newcommand{\grbmask}[1]{\langle #1 \rangle}
+    \newcommand{\grbmaskreplace}[1]{\langle\!\langle #1 \rangle\!\rangle}
+    \newcommand{\grbneg}{\neg}
+
+    % use the \mapsfrom symbol extracted from the stix package as suggested in https://tex.stackexchange.com/a/331899/71109
+    \DeclareFontEncoding{LS1}{}{}
+    \DeclareFontSubstitution{LS1}{stix}{m}{n}
+    \DeclareSymbolFont{arrows1}{LS1}{stixsf}{m}{n}
+    \DeclareMathSymbol{\mapsfrom}{\mathrel}{arrows1}{"AB}
+    \newcommand{\grbassign}{\mapsfrom}
+
+    \newcommand{\grbf}[2]{\grboperation{#1}{#2}}
+    \newcommand{\grbreduce}[4]{[ {#1}_{#2}\, #3(#4) ]}
+    \newcommand{\grbt}{^{\top}} % transpose
+    \newcommand{\grbdiv}{\grbbinaryop{\oslash}}
+    \newcommand{\grbminus}{\grbbinaryop{\ominus}}
+    \newcommand{\grbaccumeq}[1]{\mathbin{\ensuremath{\ifstrempty{#1}{\odot}{#1}\!\!=}}}
+
+    \newcommand{\grbplus}{\oplus}
+    \newcommand{\grbtimes}{\otimes}
+    \newcommand{\grbapply}{\odot}
+    
+    \newcommand{\grbfrac}[2]{\frac{#1}{#2}}
+
+    \newcommand{\grbbool}{\mathbb{B}}  % booleans
+    \newcommand{\grbuint}{\mathbb{N}}  % unsigned integers
+    \newcommand{\grbint}{\mathbb{Z}}   % integers
+    \newcommand{\grbfloat}{\mathbb{Q}} % floats (?)
+    
+    \newcommand{\grbplaceholder}[1]{\mathsf{#1}}
+
+    \newcommand{\grbscalartype}[2]{#1_{#2}}
+    \newcommand{\grbvectortype}[3]{#1_{#2}^{#3}}
+    \newcommand{\grbmatrixtype}[4]{#1_{#2}^{#3 \times #4}}
+
+    \newcommand{\grbnewscalar}[3]{\text{let: } #1 \in \grbscalartype{#2}{#3}}
+    \newcommand{\grbnewvector}[4]{\text{let: } #1 \in \grbvectortype{#2}{#3}{#4}}
+    \newcommand{\grbnewmatrix}[5]{\text{let: } #1 \in \grbmatrixtype{#2}{#3}{#4}{#5}}
+
+    \newcommand{\grbalpha}{\alpha}
+    \newcommand{\grboperator}[1]{\mathsf{#1}}
+
+    \newcommand{\grbrange}[2]{#1 \! : \! #2}
+    \newcommand{\grbdontcare}{\textvisiblespace}
+}
+
+
+% do not lange/rangle for tuples as it is already used for masks
+% do not use grbtuple for the time being
+%\newcommand{\grbtuple}[1]{( #1 )}
+
+
+% trying to avoid too much syntax (e.g. using wedge/vee symbols for LAND/LOR)
+%\newcommand{\grblorland}{\lor\!.\!\land}
+
+\newcommand{\grbsemiringops}[2]{\mathbin{\grboperator{#1.#2}}}
+\newcommand{\grbplustimes}{\grbsemiringops{\grbplus}{\grbtimes}}
+
+\newcommand{\grbanypair}{\grbsemiringops{any}{pair}}
+\newcommand{\grbanyfirst}{\grbsemiringops{any}{first}}
+\newcommand{\grbanysecond}{\grbsemiringops{any}{second}}
+\newcommand{\grblorland}{\grbsemiringops{lor}{land}}
+\newcommand{\grbminplus}{\grbsemiringops{min}{plus}}
+\newcommand{\grbmaxplus}{\grbsemiringops{max}{plus}}
+\newcommand{\grbmaxfirst}{\grbsemiringops{max}{first}}
+\newcommand{\grbminfirst}{\grbsemiringops{min}{first}}
+\newcommand{\grbminsecond}{\grbsemiringops{min}{second}}
+\newcommand{\grbmaxsecond}{\grbsemiringops{max}{second}}
+\newcommand{\grbsecondmin}{\grbsemiringops{second}{min}}
+\newcommand{\grbsecondmax}{\grbsemiringops{second}{max}}
+\newcommand{\grbarithmeticplustimes}{\grbsemiringops{plus}{times}} % not necessary because this is the default
+
+\newcommand{\grbbinaryop}[1]{\mathop{\grboperator{#1}}}
+\newcommand{\grbany}{\grbbinaryop{any}}
+\newcommand{\grbpair}{\grbbinaryop{pair}}
+\newcommand{\grbland}{\grbbinaryop{land}}
+\newcommand{\grblor}{\grbbinaryop{lor}}
+\newcommand{\grbmin}{\grbbinaryop{min}}
+\newcommand{\grbmax}{\grbbinaryop{max}}
+\newcommand{\grbfirst}{\grbbinaryop{first}}
+\newcommand{\grbsecond}{\grbbinaryop{second}}
+\newcommand{\grbfirsti}{\grbbinaryop{firsti}}
+\newcommand{\grbsecondi}{\grbbinaryop{secondi}}
+\newcommand{\grbfirstii}{\grbbinaryop{firsti1}}
+\newcommand{\grbsecondii}{\grbbinaryop{secondi1}}
+\newcommand{\grbarithmeticplus}{\grbbinaryop{plus}} % usually not necessary because this is the default addition
+\newcommand{\grbarithmetictimes}{\grbbinaryop{times}} % usually not necessary because this is the default multiplication
+\newcommand{\grbisne}{\grbbinaryop{isne}}
+
+% boolean values
+\newcommand{\grbbooleanvalue}[1]{\mathtt{#1}}
+\newcommand{\grbtrue}{\grbbooleanvalue{TRUE}}
+\newcommand{\grbfalse}{\grbbooleanvalue{FALSE}}
+\newcommand{\grbstring}{\textrm{String}}
+\newcommand{\grbdate}{\textrm{Date}}
+
+% cardinality / count
+\newcommand{\grbcnt}[1]{| #1 |}
+
+\newcommand{\grbeWiseAdd}[1]{\underset{\raisebox{.4ex}{$\scriptscriptstyle\cup$}}{#1}}
+\newcommand{\grbeWiseMult}[1]{\underset{\raisebox{.4ex}{$\scriptscriptstyle\cap$}}{#1}}
+
+% C<M> += A +.* B
+%\newcommand{\grbmult}[6]{#1{#2} \ #3\!= #5 #4 #6}
+
+% stock matrices
+\newcommand{\grbmA}{\grbm{A}}
+\newcommand{\grbmB}{\grbm{B}}
+\newcommand{\grbmC}{\grbm{C}}
+\newcommand{\grbmM}{\grbm{M}}
+% stock vectors
+\newcommand{\grbvu}{\grbv{u}}
+\newcommand{\grbvv}{\grbv{v}}
+\newcommand{\grbvw}{\grbv{w}}
+\newcommand{\grbvm}{\grbv{m}}
+% stock scalars
+\newcommand{\grbsi}{\grbs{i}}
+\newcommand{\grbsj}{\grbs{j}}
+\newcommand{\grbsn}{\grbs{n}}
+\newcommand{\grbss}{\grbs{s}}
+% stock arrays
+\newcommand{\grbaI}{\grba{I}}
+\newcommand{\grbaJ}{\grba{J}}
+\newcommand{\grbaX}{\grba{X}}
+
+% operations
+\newcommand{\grboperationnoarg}[1]{\mathit{#1}}
+\newcommand{\grboperation}[2]{\grboperationnoarg{#1}(#2)}
+\newcommand{\grbnrows}[1]{\grboperation{nrows}{#1}}
+\newcommand{\grbncols}[1]{\grboperation{ncols}{#1}}
+\newcommand{\grbnvals}[1]{\grboperation{nvals}{#1}}
+\newcommand{\grbclear}[1]{\grboperation{clear}{#1}}
+\newcommand{\grbdiag}[1]{\grboperation{diag}{#1}}
+\newcommand{\grbselect}[1]{\grboperation{select}{#1}}
+\newcommand{\grbkron}[1]{\grboperation{kron}{#1}}
+\newcommand{\grbtril}[1]{\grboperation{tril}{#1}}
+\newcommand{\grbtriu}[1]{\grboperation{triu}{#1}}
+\newcommand{\grbondiag}[1]{\grboperation{ondiag}{#1}}
+\newcommand{\grboffdiag}[1]{\grboperation{offdiag}{#1}}
+
+% bfs
+\newcommand{\grbFrontier}{\grbm{Frontier}}
+\newcommand{\grbNext}{\grbm{Next}}
+\newcommand{\grbSeen}{\grbm{Seen}}
+
+\newcommand{\grbsource}{\grbs{s}}
+\newcommand{\grbfrontier}{\grbv{frontier}}
+\newcommand{\grbnext}{\grbv{next}}
+\newcommand{\grbseen}{\grbv{seen}}
+\newcommand{\grblevel}{\grbs{level}}
+
+\newcommand{\grbfrontieri}{\grbv{frontier1}}
+\newcommand{\grbnexti}{\grbv{next1}}
+\newcommand{\grbseeni}{\grbv{seen1}}
+
+\newcommand{\grbfrontierii}{\grbv{frontier2}}
+\newcommand{\grbnextii}{\grbv{next2}}
+\newcommand{\grbseenii}{\grbv{seen2}}
+
+\newcommand{\bfsfrontier}{\grbv{frontier}}
+\newcommand{\bfsnext}{\grbv{next}}
+\newcommand{\bfsseen}{\grbv{seen}}

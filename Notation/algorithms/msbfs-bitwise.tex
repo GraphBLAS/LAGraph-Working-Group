@@ -1,0 +1,54 @@
+\begin{algorithm}[htb]
+	\footnotesize
+	\caption{Bitwise all-source MSBFS algorithm. %to compute the closeness centrality value.
+	\emph{Notation:} \textit{popcount} is a unary operator that counts the number of bits in an \grbuint{} value.
+	Lines \ref*{alg:ccv-startline}--\ref*{alg:ccv-endline} compute the CCV (cf.~Alg.~\ref{alg:GraphBLAS:Query4}).
+	%\textit{neg} applies the unary operator \lstinline{GrB_BNOT_UINT64}.
+	%\textit{dropzeros} defines a selection using \lstinline{GxB_NONZERO}.
+	%\textvisiblespace{} denotes a NULL value.
+	}
+	\label{alg:GraphBLAS:MSBFS:bitwise}
+	\begin{algorithmic}[1]
+		\Procedure{BitwiseMSBFS}{\grbm{A}}
+		\Input: $\grbm{A} \in \grbbool^{n \times n}$
+		\EndInput
+		\Data:
+			\State $I, J, X \in \grbuint^n$
+			\State $\grbFrontier, \grbNext, \grbSeen \in \grbuint^{n \times \lceil n/64 \rceil}$
+			\State $\grbv{sp} \in \grbnat^n, \grbv{cpmo} \in [0,1]^n$ \Comment{$s(p), C(p) - 1$}
+		\EndData
+		\Output: $\grbv{ccv} \in [0, 1]^n$ \Comment{closeness centrality values}
+		\EndOutput
+
+		\For{$k = 0$ \textbf{to} $n-1$} \Comment{initialize bit diagonal matrix}
+			\State $I[k] = k, \ J[k] = k/64, \ X[k] = 1 <\!< (64-(k \mathrm{\ mod\ } 64))$
+		\EndFor
+
+		\State $\grbFrontier, \grbSeen \grbassign \{ I, J, X \}$
+
+		\For{$\textit{level} = 1$ \textbf{to} $n-1$}
+			\State $\grbNext = \grbA \mathtt{\ BOR.SECOND\ } \grbFrontier$
+			%\State $\grbNext = (\grbFrontier\grbt \mathtt{\ BOR.FIRST\ } \grbA)\grbt$
+			\State $\grbNext\grbmask{\grbNext} \mathtt{\ BAND}\!\!= \texttt{BNOT}(\grbSeen)$
+			\State $\grbNext = \mathtt{GxB\_NONZERO}(\grbNext)$ \Comment{prune explicit zeros}
+			\If {$\grbNext$ is empty} break \EndIf
+			\State $\grbFrontier = \grbNext$
+			\State $\grbSeen = \grbSeen \mathtt{\ BOR\ } \grbNext$
+	
+			\vspace{0.5ex}
+			\hrule
+			\vspace{0.5ex}
+
+			\State \label{alg:ccv-startline}
+			$\grbv{nextCount} = [{\oplus}_j \textit{popcount}(\grbNext)(:,j)]$
+
+			\State
+			$\grbv{sp} \ \oplus\!\!= \grbv{nextCount} \times \textit{level}$
+		\EndFor
+		\State $\grbv{cpmo} = [{\oplus}_j \textit{popcount}(\grbSeen)(:,j)] - 1$ \Comment{$C(p)-1$}
+		\State \Return $(\grbv{cpmo} \otimes \grbv{cpmo}) \oslash ((n-1) \otimes \grbv{sp})$ \Comment{$\frac{(C(p)-1)^2}{(n-1) \cdot s(p)}$}
+		\label{alg:ccv-endline}
+
+		\EndProcedure
+		\end{algorithmic}
+\end{algorithm}

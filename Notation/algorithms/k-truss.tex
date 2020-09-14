@@ -1,0 +1,16 @@
+\begin{algorithm}[htb]
+	\label{alg:triangle-count-cohen}
+	\caption{$k$-truss algorithm.}
+	%\KwData{...}
+	%\KwResult{...}
+	\Fn{KTruss}{
+        $\grbm{C} \grbassign \grbm{A}$ \;
+        $\grbs{nonzeros} \grbassign \grbnvals{C}$ \;
+		\For{$\grbs{i} = 1$ \KwTo $\grbs{n} - 1$}{
+            $\grbm{C}\grbmask{\grbm{C}} = \grbm{C} \grbsemiringops{\grbplus}{\grbland} \grbm{C}$ \;
+            $\grbm{C} = \grbselect{\grbm{C} \geq \grbs{k-2}}$ \;
+            \If {$\grbs{nonzeros} == \grbnvals{C}$}{\Break}
+            $\grbs{nonzeros} \grbassign \grbnvals{C}$ \;
+        }
+	}
+\end{algorithm}
