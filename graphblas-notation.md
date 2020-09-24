@@ -4,7 +4,7 @@ This is a working document to come up with a notation for typesetting the pseudo
 
 ## Requirements
 
-We would like to come up with a consistent notation in LaTeX that also has an ASCII counterpart (and it should also work in presentations).
+We would like to come up with a consistent notation in LaTeX that also has an ASCII counterpart (and it should also work in WYSIWYG presentation software).
 
 It would be nice if the LaTeX one could be mapped to PowerPoint's equation editor (Gabor).
 
