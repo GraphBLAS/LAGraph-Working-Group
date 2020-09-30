@@ -1,6 +1,8 @@
 
 // LAGraph graph
 
+// NOTE: LAGraph_Graph G: is a read-only object if "input" to an
+// algorithm.  Need utility functions to compute/destroy properties.
 typedef struct
 {
     GrB_Matrix A ;
@@ -12,7 +14,13 @@ typedef struct
     undirected, directed
     bipartite, etc
     weighted, unweighted? ... constant value?
-    ...
+    acyclic?
+
+    sorted ascending by degree?  sorted descending by degree?
+        : yes, no, no idea
+
+    GrB_Vector *in_degree,    // in-degree of each node?
+    GrB_Vector *out_degree,   // out-degree of each node?
 }
 LAGraph_Graph ;
 
@@ -38,7 +46,7 @@ or
     LAGraph_BreadthFirstSearch (&level, NULL, ...)
 
 //------------------------------------------------------------------------------
-// breadth first search
+// ALGO: breadth first search
 //------------------------------------------------------------------------------
 
 // Policy: in general, if an input *x is NULL, do not compute
@@ -87,7 +95,7 @@ GrB_Info LAGraph_BreadthFirstSearch_Frontier
 ) ;
 
 //------------------------------------------------------------------------------
-// connected components:
+// ALGO: connected components:
 //------------------------------------------------------------------------------
 
 // TODO: utility to do SCC = Comm * G * Comm'
@@ -134,7 +142,7 @@ GrB_Info LAGraph_ConnectedComponents_Weakly
 ) ;
 
 //------------------------------------------------------------------------------
-// centrality:
+// ALGO: centrality:
 //------------------------------------------------------------------------------
 
 // TODO: utility to remove self loops, or add all self-loops (G=G+I), ...
@@ -201,16 +209,13 @@ GrB_Info LAGraph_EdgeCentrality
 
 
 //------------------------------------------------------------------------------
-// shortest paths:
+// ALGO: shortest paths:
 //------------------------------------------------------------------------------
 
 GrB_Info LAGraph_ShortestPath_[...]
 
 GrB_Info LAGraph_ShortestPath_SingleSource
 (
-    // output:
-    LAGraph_info *LGInfo,
-
     // output: if NULL do not compute
     GrB_Vector *distance,       // type: INT64, FP32, or FP64
                                 // INT64: if G is int*
@@ -218,15 +223,17 @@ GrB_Info LAGraph_ShortestPath_SingleSource
                                 // FP32: if G is FP32
                                 // FP64: if G is FP64
     GrB_Vector *parent,         // tree
-    GrB_Vector *hops,           // # of hops, level from source
+    GrB_Vector *hops,           // # of hops, level from source (call it "level")?
 
     // input:
     GrB_Index source,
-    LAGraph_Graph G 
+    LAGraph_Graph G,
+    // error handling (every LAGraph function has this last):
+    char *message
 ) ;
 
     // negative-weight-cycle: result is not defined, must stop!
-    // report info = GrB_NO_VALUE. or something else
+    // report info < 0 (an error)
 
 // there is no:
 GrB_set_error (C, string)
@@ -281,14 +288,14 @@ GrB_Matrix_error (&s, A) ;
 
 GrB_Info LAGraph_ShortestPath_AllPairs
 (
-    // input/output:
-    LAGraph_Info *info,
     // output:
     GrB_Matrix *Distance,
     GrB_Matrix *Parent,
     GrB_Matrix *Hops,
     // input:
     LAGraph_Graph G,
+    // input/output
+    char *message
 ) ;
 
 // Dist, Parent undefined on input, created on output, just like GrB_Matrix_new
@@ -316,8 +323,47 @@ info = LAGraph_something (&Dist, &Parent, NULL, G) ;
 
     GrB_Info info = LAGraph_BFS (&level, source, G) ;
 
+// or:
+    typedef struct
+    {
+        GrB_Info info ;
+        char message [120] ;
+    }
+    LAGraph_Info ;
+    int info = LAGraph_ShortestPath_AllPairs (Dis, Pa, Hop, G, &lginfo) ;
 
-    
+    info = LAGraph_something ( ... )
+    if (info .. is > 0) handle the error
+
+    info = LAGraph_somethingelse ( ... )
+    if (info .. is zero) handle the error
+
+    // buffer overflow:
+    char message [42] ;
+    LAGraph_enum info = LAGraph_ShortestPath_AllPairs (Dis, Pa, Hop, G, &message) ;
+
+    // do not need this:
+    typedef enum
+    {
+        LAGraph_SUCCESS = 0,
+        LAGraph_WARNING = 1,
+        LAGraph_ERROR = -1 
+    }
+    LAGraph_Info_enum ;
+
+// final design for error handling:
+//   but is LAGRAPH_MESSAGE_LENGTH too wordy?
+    #define LAGRAPH_MESSAGE_LENGTH 256
+    char message [LAGRAPH_MESSAGE_LENGTH] ;
+    int info = LAGraph_ShortestPath_AllPairs (Dis, Pa, Hop, G, &message) ;
+    // convention: 0:ok, < error, > warning.
+    // if no message, we set message [0] = '\0' (if not NULL)
+
+    // no message:
+    int info = LAGraph_ShortestPath_AllPairs (Dis, Pa, Hop, G, NULL) ;
+
+    info: not an enum
+
 //------------------------------------------------------------------------------
 // what's next?
 //------------------------------------------------------------------------------
@@ -325,4 +371,41 @@ info = LAGraph_something (&Dist, &Parent, NULL, G) ;
 GAP: BFS, SSSP, TriangleCount, Conn.Components, PageRank, BetweennessCentrality
 
 LDBC: Local Clustering Coef, CDLP, different PageRank
+
+Luby's MIS
+minimum spanning forest
+k-truss
+max flow
+Louvain community detection
+
+Notation
+
+Doxygen
+
+//------------------------------------------------------------------------------
+// ALGO: triangle counting
+//------------------------------------------------------------------------------
+
+// LAGraph_Graph G: is a read-only object if "input"
+
+int LAGraph_TriangleCount
+(
+    uint64_t *ntriangles,   // # of triangles
+    // input:
+    LAGraph_Graph G,
+    // input/output:
+    char *message
+) ;
+
+int LAGraph_TriangleCount_expert
+(
+    uint64_t *ntriangles,   // # of triangles
+    // input:
+    int method,
+    LAGraph_Graph G,
+    // input/output:
+    char *message
+) ;
+
+// TODO:  # triangles incident on each node/edge
 
