@@ -5,16 +5,32 @@
 // algorithm.  Need utility functions to compute/destroy properties.
 typedef struct
 {
-    GrB_Matrix A ;
+    GrB_Matrix A ;      // or U, V?
 
     // may be NULL:
     GrB_Matrix AT ;
 
     // graph properties
-    undirected, directed
-    bipartite, etc
+    enum: undirected, directed, bipartite, incidence
+
+        0  A
+        A' 0
+
     weighted, unweighted? ... constant value?
     acyclic?
+
+    simple graph vs multigraph?
+
+    bipartite graph: A(i,j) is the edge (i,j), i and j in different spaces
+    hypergraph: A(i,:) is the ith hyperedge
+        A is e-by-n with n nodes and e edges
+    incidence matrix: A(i,:) is the ith edge
+        A is e-by-n with n nodes and e edges
+
+    or do we hold another GrB_Matrix E for incidence matrix?
+
+    # of connected components
+    component labels?
 
     sorted ascending by degree?  sorted descending by degree?
         : yes, no, no idea
@@ -408,4 +424,42 @@ int LAGraph_TriangleCount_expert
 ) ;
 
 // TODO:  # triangles incident on each node/edge
+
+//------------------------------------------------------------------------------
+// ALGO: k-truss
+//------------------------------------------------------------------------------
+
+// this should OK: G = func(G)
+LAGraph_anything (/* out: */ &G, k, /* in: */ G, &message) ;
+
+LAGraph_Graph Gnew = LAGraph_create ( ) ; ;
+LAGraph_anything (/* out: */ Gnew, k, /* in: */ G, &message) ;
+
+int LAGraph_Ktruss_next
+(
+    // input/output:
+    LAGraph_Graph Gnext,
+    // input:
+    uint64_t k,
+    LAGraph_Graph Gprev,        // (k-1)-truss on input, with support A(i,j)
+    // input/output:
+    char *message
+) ;
+
+LAGraph_Graph K = NULL ;
+LAGraph_Ktruss_all
+
+int LAGraph_Ktruss_all
+(
+    // output:
+    LAGraph_Graph *K,           // an array of LAGraph_Graph, each with support
+    // output:
+    uint64_t *kmax,                
+    LAGraph_Graph G,            // just a graph
+    // input/output:
+    char *message
+) ;
+
+    // k = 12 on output:
+    // K[3], ... K[11].
 
