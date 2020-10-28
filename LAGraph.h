@@ -1,5 +1,42 @@
 
+typedef enum
+{
+    // enum:
+    //     adjacency
+    //         undirected
+    //         directed
+    //     bipartite
+    //         one kind so far
+    //     later: incidence
+
+    // A(i,j) is the edge (i,j)
+    // undirected: A is square, symmetric (both tril and triu present)
+    // directed: A is square, unsymmetric or might happen to symmetric
+    // bipartite: A is rectangular (later) or might happen to be square
+    LAGRAPH_ADJACENCY_UNDIRECTED = 1,
+    LAGRAPH_ADJACENCY_UNDIRECTED_TRIL = ...,
+    LAGRAPH_ADJACENCY_UNDIRECTED_TRIU = ...,
+    LAGRAPH_ADJACENCY_DIRECTED = 2,
+    LAGRAPH_BIPARTITE = 3,
+    // ...
+}
+LAGraph_Category ;
+
 // LAGraph graph
+typedef struct
+{
+    GrB_Matrix A ;
+
+    // properties:
+    GrB_Matrix AT ;
+
+    // graph category
+    LAgraph_Category category ;
+
+}
+LAGraph_Graph_struct ;
+typedef struct LAGraph_Graph_struct *LAGraph_Graph ;
+
 
 // NOTE: LAGraph_Graph G: is a read-only object if "input" to an
 // algorithm.  Need utility functions to compute/destroy properties.
@@ -14,7 +51,7 @@ typedef struct
     enum: undirected, directed, bipartite, incidence
 
         0  A
-        A' 0
+        B  0
 
     weighted, unweighted? ... constant value?
     acyclic?
@@ -38,7 +75,8 @@ typedef struct
     GrB_Vector *in_degree,    // in-degree of each node?
     GrB_Vector *out_degree,   // out-degree of each node?
 }
-LAGraph_Graph ;
+LAGraph_Graph_struct ;
+
 
 // or a different return value for error status?
 
@@ -69,17 +107,20 @@ or
 
 // TODO: hops for all methods?
 
-GrB_Info LAGraph_BreadthFirstSearch     // no _Variant suffix
+GrB_Vector level = NULL ;
+GrB_Vector parent = NULL ;
+int LAGraph_BreadthFirstSearch     // no _Variant suffix
 (
     // outputs:
     GrB_Vector *level,              // if NULL do not compute
     GrB_Vector *parent,             // if NULL do not compute
     // inputs:
     LAGraph_Graph G,
-    GrB_Index source
+    GrB_Index source,
+    char *message
 ) ;
 
-GrB_Info LAGraph_BreadthFirstSearch_MultiSource
+int LAGraph_BreadthFirstSearch_MultiSource
 (
     // outputs:
     GrB_Matrix *level,              // if NULL do not compute
@@ -87,6 +128,7 @@ GrB_Info LAGraph_BreadthFirstSearch_MultiSource
     // inputs:
     LAGraph_Graph G,
     GrB_Index *sources, size_t nsources     // or LAGraph_array?  GrB_array?
+    char *message
 ) ;
 
 info = LAGraph_whatever (&level, NULL, G, Src, 5) ;
@@ -251,56 +293,8 @@ GrB_Info LAGraph_ShortestPath_SingleSource
     // negative-weight-cycle: result is not defined, must stop!
     // report info < 0 (an error)
 
-// there is no:
-GrB_set_error (C, string)
-char *GrB_Matrix_error (GrB_Matrix C) ;
-char *GrB_error (object) ; // polymorphic
 
-// one solution:  but what if 2 LAGraph calls want to use G at the same time?
-// G is input, and GrB_Matrix_wait(G->A) has been done so it is read-only.
-// ... except for the error string here...
-    char *LAGraph_report (G) ;
 
-// another solution:
-typedef struct
-{
-    GrB_Info info ;
-    char message [128] ;
-}
-LAGraph_Info ;
-
-typedef enum    // we need an LAGraph_Info
-{
-    // success, but ...:
-    GrB_SUCCESS = 0,            // all is well
-    GrB_NO_VALUE = 1,           // A(i,j) requested but not there
-
-    // API errors:
-    GrB_UNINITIALIZED_OBJECT = 2,   // object has not been initialized
-    GrB_INVALID_OBJECT = 3,         // object is corrupted
-    GrB_NULL_POINTER = 4,           // input pointer is NULL
-    GrB_INVALID_VALUE = 5,          // generic error code; some value is bad
-    GrB_INVALID_INDEX = 6,          // a row or column index is out of bounds;
-                                    // used for indices passed as scalars, not
-                                    // in a list.
-    GrB_DOMAIN_MISMATCH = 7,        // object domains are not compatible
-    GrB_DIMENSION_MISMATCH = 8,     // matrix dimensions do not match
-    GrB_OUTPUT_NOT_EMPTY = 9,       // output matrix already has values in it
-
-    // execution errors:
-    GrB_OUT_OF_MEMORY = 10,         // out of memory
-    GrB_INSUFFICIENT_SPACE = 11,    // output array not large enough
-    GrB_INDEX_OUT_OF_BOUNDS = 12,   // a row or column index is out of bounds;
-                                    // used for indices in a list of indices.
-    GrB_PANIC = 13                  // unknown error, or GrB_init not called.
-}
-GrB_Info ;
-
-GrB_Matrix_error (&s, A) ;
-
-            // later: or not at all:
-            // GrB_Info LAGraph_ShortestPath_SingleSourceSingleDestination
-            // GrB_Info LAGraph_ShortestPath_MultiSource ??
 
 GrB_Info LAGraph_ShortestPath_AllPairs
 (
@@ -318,56 +312,9 @@ GrB_Info LAGraph_ShortestPath_AllPairs
 info = LAGraph_something (&Dist, &Parent, NULL, G) ;
 
 //------------------------------------------------------------------------------
-
-    LAGraph_Info lginfo ;   // fixed size, no malloc
-
-    typedef struct
-    {
-        int64_t info ;     // algorithm specific, warning > 0, ok 0, err<0
-        char message [120] ;
-    }
-    LAGraph_Info ;
-
-    LAGraph_ShortestPath_AllPairs (Dis, Pa, Hop, G, NULL) ;
-    i = LAGraph_utility (stuff, G, NULL) ;    // no LAGraph_Info needed
-
-    GrB_Info info = LAGraph_ShortestPath_AllPairs (Dis, Pa, Hop, G, &lginfo) ;
-    if (info != GrB_SUCCESS) 
-    {
-        printf ("oops %d:%s\n", lginfo.info, lginfo.message) ;
-    }
-
-    GrB_Info info = LAGraph_BFS (&level, source, G) ;
-
-// or:
-    typedef struct
-    {
-        GrB_Info info ;
-        char message [120] ;
-    }
-    LAGraph_Info ;
-    int info = LAGraph_ShortestPath_AllPairs (Dis, Pa, Hop, G, &lginfo) ;
-
-    info = LAGraph_something ( ... )
-    if (info .. is > 0) handle the error
-
-    info = LAGraph_somethingelse ( ... )
-    if (info .. is zero) handle the error
-
-    // buffer overflow:
-    char message [42] ;
-    LAGraph_enum info = LAGraph_ShortestPath_AllPairs (Dis, Pa, Hop, G, &message) ;
-
-    // do not need this:
-    typedef enum
-    {
-        LAGraph_SUCCESS = 0,
-        LAGraph_WARNING = 1,
-        LAGraph_ERROR = -1 
-    }
-    LAGraph_Info_enum ;
-
 // final design for error handling:
+//------------------------------------------------------------------------------
+
 //   but is LAGRAPH_MESSAGE_LENGTH too wordy?
     #define LAGRAPH_MESSAGE_LENGTH 256
     char message [LAGRAPH_MESSAGE_LENGTH] ;
@@ -378,7 +325,7 @@ info = LAGraph_something (&Dist, &Parent, NULL, G) ;
     // no message:
     int info = LAGraph_ShortestPath_AllPairs (Dis, Pa, Hop, G, NULL) ;
 
-    info: not an enum
+    LAGraph info: not an enum, just an int
 
 //------------------------------------------------------------------------------
 // what's next?
@@ -429,10 +376,17 @@ int LAGraph_TriangleCount_expert
 // ALGO: k-truss
 //------------------------------------------------------------------------------
 
-// this should OK: G = func(G)
-LAGraph_anything (/* out: */ &G, k, /* in: */ G, &message) ;
+    // this should OK: G = func(G); we know G is aliased in/out
+    LAGraph_anything (/* out: */ &G, k, /* in: */ G, &message) ;
 
-LAGraph_Graph Gnew = LAGraph_create ( ) ; ;
+    G = NULL ;      // make a new G
+    LAGraph_anything (/* out: */ &G, k, /* in: */ H, &message) ;
+
+
+    LAGraph_Graph G ;
+    LAGraph_anything (/* out: */ &G, k, /* in: */ G, &message) ;
+
+LAGraph_Graph Gnew = LAGraph_create ( ) ;
 LAGraph_anything (/* out: */ Gnew, k, /* in: */ G, &message) ;
 
 int LAGraph_Ktruss_next
@@ -447,7 +401,6 @@ int LAGraph_Ktruss_next
 ) ;
 
 LAGraph_Graph K = NULL ;
-LAGraph_Ktruss_all
 
 int LAGraph_Ktruss_all
 (
