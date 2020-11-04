@@ -20,18 +20,24 @@ typedef enum
     LAGRAPH_BIPARTITE = 3,
     // ...
 }
-LAGraph_Category ;
+LAGraph_Kind ;
 
 // LAGraph graph
 typedef struct
 {
+    // the graph itself:
     GrB_Matrix A ;
+    GrB_Vector vertex_attributes ; // ???
 
-    // properties:
-    GrB_Matrix AT ;
+    // the kind of graph:
+    LAGraph_Kind kind ;
 
-    // graph category
-    LAgraph_Category category ;
+    //-----------------------------------------------------------
+ 
+// cached stuff
+        // properties/cached stuff I can recompute at any time ...:
+        GrB_Matrix AT ;
+        GrB_Vector rowdegree, coldegree ;
 
 }
 LAGraph_Graph_struct ;
