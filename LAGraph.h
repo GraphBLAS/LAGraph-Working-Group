@@ -13,11 +13,23 @@ typedef enum
     // undirected: A is square, symmetric (both tril and triu present)
     // directed: A is square, unsymmetric or might happen to symmetric
     // bipartite: A is rectangular (later) or might happen to be square
+    LAGRAPH_UNKNOWN = 0,
     LAGRAPH_ADJACENCY_UNDIRECTED = 1,
-    LAGRAPH_ADJACENCY_UNDIRECTED_TRIL = ...,
-    LAGRAPH_ADJACENCY_UNDIRECTED_TRIU = ...,
     LAGRAPH_ADJACENCY_DIRECTED = 2,
-    LAGRAPH_BIPARTITE = 3,
+
+    // LAGRAPH_ADJACENCY_UNDIRECTED_TRIL = ...,
+    // LAGRAPH_ADJACENCY_UNDIRECTED_TRIU = ...,
+    // LAGRAPH_BIPARTITE = ...,
+    // LAGRAPH_BIPARTITE_DIRECTED = ...,
+    // LAGRAPH_BIPARTITE_UNDIRECTED = ...,
+    // LAGRAPH_INCIDENCE_* = ...,
+    // LAGRAPH_MULTIGRAPH_* = ...,
+    // LAGRAPH_HYPERGRAPH = ...,
+    // LAGRAPH_HYPERGRAPH_DIRECTED = ...,
+    // for example:
+    //
+    //                       5   node7 8   11  ...
+    //      ith row:  [     -1   -1    1  -1  -1  1 ]    ith edge
     // ...
 }
 LAGraph_Kind ;
@@ -25,19 +37,36 @@ LAGraph_Kind ;
 // LAGraph graph
 typedef struct
 {
-    // the graph itself:
-    GrB_Matrix A ;
-    GrB_Vector vertex_attributes ; // ???
 
-    // the kind of graph:
-    LAGraph_Kind kind ;
+    GrB_Matrix A ;      // the graph itself:
+    LAGraph_Kind kind ; // the kind of graph:
 
     //-----------------------------------------------------------
  
-// cached stuff
-        // properties/cached stuff I can recompute at any time ...:
-        GrB_Matrix AT ;
-        GrB_Vector rowdegree, coldegree ;
+    // cached:
+
+    // if present, they are correct.
+    // to invalidate: delete them
+
+    // TODO: write a utility to clear all cache
+
+    // when does an algorithm choose to (a) *update* these? (b) delete?
+    //      default: algo decides
+    //      others modes?
+
+    // can be recomputed at any time via utility functions,
+    // or freed at will (if Graph is input/output to a method)
+    GrB_Matrix AT ;
+    GrB_Vector rowdegree ;
+    GrB_Vector coldegree ;
+    // AT = A' regardless of kind
+    // rowdegree (i) = nvals (A (i,:)), regardless of kind
+    // coldegree (j) = nvals (A (:,j)), regardless of kind
+
+    // possible future cached properties:
+    // GrB_Vector rowsum, colsum ;
+    // rowsum (i) = sum (A (i,:)), regardless of kind
+    // colsum (j) = sum (A (:,j)), regardless of kind
 
 }
 LAGraph_Graph_struct ;
@@ -78,8 +107,8 @@ typedef struct
     sorted ascending by degree?  sorted descending by degree?
         : yes, no, no idea
 
-    GrB_Vector *in_degree,    // in-degree of each node?
-    GrB_Vector *out_degree,   // out-degree of each node?
+    GrB_Vector in_degree,    // in-degree of each node?
+    GrB_Vector out_degree,   // out-degree of each node?
 }
 LAGraph_Graph_struct ;
 
