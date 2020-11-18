@@ -1,4 +1,21 @@
 
+#define LAGRAPH_ERROR(message,info)                                         \
+{                                                                           \
+    fprintf (stderr, "LAGraph error: %s\n[%d]\nFile: %s Line: %d\n",        \
+        message, info, __FILE__, __LINE__) ;                                \
+    LAGRAPH_FREE_ALL ;                                                      \
+    return (info) ;                                                         \
+}
+
+#define LAGRAPH_OK(method)                                                  \
+{                                                                           \
+    info = method ;                                                         \
+    if (! (info == GrB_SUCCESS || info == GrB_NO_VALUE))                    \
+    {                                                                       \
+        LAGRAPH_ERROR ("", info) ;                                          \
+    }                                                                       \
+}
+
 typedef enum
 {
     // enum:
@@ -41,6 +58,11 @@ typedef struct
     GrB_Matrix A ;      // the graph itself:
     LAGraph_Kind kind ; // the kind of graph:
 
+    // possible future:
+    // multigraph ..
+    // GrB_Matrix *Amult ; // array of size nmatrices
+    // int nmatrices ;
+
     //-----------------------------------------------------------
  
     // cached:
@@ -59,6 +81,7 @@ typedef struct
     GrB_Matrix AT ;
     GrB_Vector rowdegree ;
     GrB_Vector coldegree ;
+    consider: enum A_is_symmetric : yes, no, i don't know
     // AT = A' regardless of kind
     // rowdegree (i) = nvals (A (i,:)), regardless of kind
     // coldegree (j) = nvals (A (:,j)), regardless of kind
@@ -73,47 +96,6 @@ LAGraph_Graph_struct ;
 typedef struct LAGraph_Graph_struct *LAGraph_Graph ;
 
 
-// NOTE: LAGraph_Graph G: is a read-only object if "input" to an
-// algorithm.  Need utility functions to compute/destroy properties.
-typedef struct
-{
-    GrB_Matrix A ;      // or U, V?
-
-    // may be NULL:
-    GrB_Matrix AT ;
-
-    // graph properties
-    enum: undirected, directed, bipartite, incidence
-
-        0  A
-        B  0
-
-    weighted, unweighted? ... constant value?
-    acyclic?
-
-    simple graph vs multigraph?
-
-    bipartite graph: A(i,j) is the edge (i,j), i and j in different spaces
-    hypergraph: A(i,:) is the ith hyperedge
-        A is e-by-n with n nodes and e edges
-    incidence matrix: A(i,:) is the ith edge
-        A is e-by-n with n nodes and e edges
-
-    or do we hold another GrB_Matrix E for incidence matrix?
-
-    # of connected components
-    component labels?
-
-    sorted ascending by degree?  sorted descending by degree?
-        : yes, no, no idea
-
-    GrB_Vector in_degree,    // in-degree of each node?
-    GrB_Vector out_degree,   // out-degree of each node?
-}
-LAGraph_Graph_struct ;
-
-
-// or a different return value for error status?
 
 // TODO: discuss sanity checking.
 // what if A is unsymmetric, but the graph is labeled "undirected"?
@@ -154,6 +136,10 @@ int LAGraph_BreadthFirstSearch     // no _Variant suffix
     GrB_Index source,
     char *message
 ) ;
+
+GrB_Vector parent ; // undefined
+result = LAGraph_BreadthFirstSearch (NULL, &parent, G, 0, NULL) ;
+if result is bad, parent = NULL
 
 int LAGraph_BreadthFirstSearch_MultiSource
 (
