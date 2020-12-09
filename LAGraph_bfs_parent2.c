@@ -6,6 +6,7 @@
     LAGraph:  graph algorithms based on GraphBLAS
 
     Copyright 2020 LAGraph Contributors.
+    SPDX-License-Identifier: BSD-2
 
     (see Contributors.txt for a full list of Contributors; see
     ContributionInstructions.txt for information on how you can Contribute to
@@ -116,7 +117,7 @@ GrB_Info LAGraph_bfs_parent2 // push-pull BFS, compute the tree only
     // check inputs
     //--------------------------------------------------------------------------
 
-    GrB_Info info ;
+    int info ;
     GrB_Vector q = NULL ;           // the current frontier
     GrB_Vector pi = NULL ;          // parent vector
     GrB_Vector w = NULL ;           // to compute work remaining
@@ -128,42 +129,13 @@ GrB_Info LAGraph_bfs_parent2 // push-pull BFS, compute the tree only
         LAGRAPH_ERROR ("required arguments are NULL", GrB_NULL_POINTER) ;
     }
 
-    // opt
-
+    GrB_Index nrows, ncols, nvals ;
+    GrB_Matrix A = G.A ;
+    GrB_Matrix AT = G.AT ;
+    GrB_Vector Degree = G.rowdegree ;
     LAGraph_TRY (GrB_Matrix_nrows (&nrows, A)) ;
     LAGraph_TRY (GrB_Matrix_ncols (&ncols, A)) ;
     LAGraph_TRY (GrB_Matrix_nvals (&nvals, A)) ;
-    LAGraph_TRY (GrB_Matrix_nvals (&nvals, A)) ;
-
-#define LAGraph_TRY(LAGraph_method)                                         \
-{                                                                           \
-    int info = (LAGraph_method) ;                                           \
-    if (info != 0)                                                          \
-    {                                                                       \
-        LAGRAPH_ERROR ("", info) ;                                          \
-    }                                                                       \
-}
-
-#define LAGraph_TRY(GrB_method)                                             \
-{                                                                           \
-    GrB_Info info = (GrB_method) ;                                          \
-    if (!(info == GrB_SUCCESS || info == GrB_NO_VALUE))                     \
-    {                                                                       \
-        LAGRAPH_ERROR ("", info) ;                                          \
-    }                                                                       \
-}
-
-    GrB_Index nrows, ncols, nvals ;
-    if (A == NULL)
-    {
-        // only AT is provided
-        LAGr_Matrix_ncols (&nrows, AT) ;
-        LAGr_Matrix_nrows (&ncols, AT) ;
-        LAGr_Matrix_nvals (&nvals, AT) ;
-    }
-    else
-    {
-    // A is provided.  AT may or may not be provided
 
     if (nrows != ncols)
     {
@@ -174,6 +146,10 @@ GrB_Info LAGraph_bfs_parent2 // push-pull BFS, compute the tree only
     //--------------------------------------------------------------------------
     // check the format of A and AT
     //--------------------------------------------------------------------------
+
+#ifdef SS4
+    
+    LAGraph_SS_bfs_parent ( ... ) ;
 
     bool A_csr = true, AT_csr = true ;
     if (A != NULL)
@@ -217,13 +193,25 @@ GrB_Info LAGraph_bfs_parent2 // push-pull BFS, compute the tree only
     LAGr_Vector_setElement (q, source, source) ;
     GrB_Index nq = 1 ;          // number of nodes in the current level
 
-    if (n > INT32_MAX)
-    {
-        semiring = GxB_ANY_SECONDI_INT64 ;
-    }
+    if (parent == NULL)
+        
+        // just want the level, not parent
+        semiring = GrB_LOR_LAND_BOOL ;
+        semiring = GxB_ANY_PAIR_BOOL ;
+
+
     else
     {
-        semiring = GxB_ANY_SECONDI_INT32 ;
+        // need the parent
+        if (n > INT32_MAX)
+        {
+            semiring = GrB_MIN_FIRST_INT64 ;
+            semiring = GxB_ANY_SECONDI_INT64 ;
+        }
+        else
+        {
+            semiring = GxB_ANY_SECONDI_INT32 ;
+        }
     }
 
     // pi = an empty bitmap vector
@@ -344,6 +332,50 @@ GrB_Info LAGraph_bfs_parent2 // push-pull BFS, compute the tree only
         // pi<q> = q
         LAGr_assign (pi, q, NULL, q, GrB_ALL, n, GrB_DESC_S) ;
     }
+
+#else
+    
+    if ( .. parent ... and no level)
+    {
+
+        LAGRAPH_TRY (GrB_assign (pi, NULL, NULL, -1, GrB_ALL, n, GrB_DESC_S)) ;
+        while (1)
+        {
+            LAGRAPH_TRY (GrB_assign (q, q, NULL, ramp, GrB_ALL, n, GrB_DESC_S));
+            LAGRAPH_TRY (GrB_vxm (q, pi, NULL, semiring, q, A, GrB_DESC_RSC)) ;
+            LAGRAPH_TRY (GrB_Vector_nvals (&nq, q)) ;
+            if (nq == 0) break ;
+            LAGRAPH_TRY (GrB_assign (pi, q, NULL, q, GrB_ALL, n, GrB_DESC_S) ;
+        }
+
+    }
+    else if both parent and level
+    {
+
+        for (int64_t k = 0 ; k < n ; k++)
+        {
+            LAGRAPH_TRY (GrB_assign (q, q, NULL, ramp, GrB_ALL, n, GrB_DESC_S));
+            LAGRAPH_TRY (GrB_vxm (q, pi, NULL, semiring, q, A, GrB_DESC_RSC)) ;
+            LAGRAPH_TRY (GrB_Vector_nvals (&nq, q)) ;
+            if (nq == 0) break ;
+            LAGRAPH_TRY (GrB_assign (pi, q, NULL, q, GrB_ALL, n, GrB_DESC_S) ;
+            LAGRAPH_TRY (GrB_assign (level, q, NULL, k, GrB_ALL, n, GrB_DESC_S) ;
+        }
+
+    }
+    else
+    {
+
+        // level only
+        for (int64_t k = 0 ; k < n ; k++)
+        {
+            LAGRAPH_TRY (GrB_vxm (q, pi, NULL, semiring, q, A, GrB_DESC_RSC)) ;
+            LAGRAPH_TRY (GrB_Vector_nvals (&nq, q)) ;
+            if (nq == 0) break ;
+            LAGRAPH_TRY (GrB_assign (level, q, NULL, k, GrB_ALL, n, GrB_DESC_S) ;
+        }
+
+#endif
 
     //--------------------------------------------------------------------------
     // free workspace and return result

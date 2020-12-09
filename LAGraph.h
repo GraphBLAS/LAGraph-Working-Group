@@ -1,20 +1,25 @@
 
-#define LAGRAPH_ERROR(message,info)                                         \
+// LAGraph.h
+#define LAGRAPH_ERROR(error_message,info)                                   \
 {                                                                           \
-    fprintf (stderr, "LAGraph error: %s\n[%d]\nFile: %s Line: %d\n",        \
-        message, info, __FILE__, __LINE__) ;                                \
+    if (message != NULL) strcpy (message, error_message) ;                  \
     LAGRAPH_FREE_ALL ;                                                      \
     return (info) ;                                                         \
 }
 
-#define LAGRAPH_OK(method)                                                  \
+// int info ; must be declared to use this macro
+#define LAGraph_TRY(LAGraph_or_GrB_method)                                  \
 {                                                                           \
-    info = method ;                                                         \
-    if (! (info == GrB_SUCCESS || info == GrB_NO_VALUE))                    \
+    info = (LAGraph_or_GrB_method) ;                                        \
+    if (info < 0)                                                           \
     {                                                                       \
-        LAGRAPH_ERROR ("", info) ;                                          \
+        LAGRAPH_ERROR ("" __LINE__ __FILE__ , info) ;                       \
     }                                                                       \
 }
+
+// LAGraph_internal.h
+#include "LAGraph.h"
+#define TRY(method) LAGraph_TRY(method)
 
 typedef enum
 {
@@ -124,8 +129,8 @@ or
 
 // TODO: hops for all methods?
 
-GrB_Vector level = NULL ;
-GrB_Vector parent = NULL ;
+GrB_Vector level ;
+GrB_Vector parent ;
 int LAGraph_BreadthFirstSearch     // no _Variant suffix
 (
     // outputs:
