@@ -45,13 +45,9 @@ jobs:
           mkdir build
           mv Notation/lagraph*.pdf build/
           mv Notation/README.md build/
-      - name: Install SSH Client 🔑
-        uses: webfactory/ssh-agent@v0.5.2
-        with:
-          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.1
         with:
-          SSH: true
-          BRANCH: compiled-pdf
-          FOLDER: build
+          branch: compiled-pdf
+          folder: build
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
