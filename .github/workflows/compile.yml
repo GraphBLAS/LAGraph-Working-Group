@@ -50,4 +50,3 @@ jobs:
         with:
           branch: compiled-pdf
           folder: build
-          ssh-key: ${{ secrets.DEPLOY_KEY }}
