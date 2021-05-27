@@ -337,7 +337,7 @@ GrB_Info LAGraph_bfs_parent2 // push-pull BFS, compute the tree only
     
     if ( .. parent ... and no level)
     {
-
+        // parent only
         LAGRAPH_TRY (GrB_assign (pi, NULL, NULL, -1, GrB_ALL, n, GrB_DESC_S)) ;
         while (1)
         {
@@ -352,6 +352,7 @@ GrB_Info LAGraph_bfs_parent2 // push-pull BFS, compute the tree only
     else if both parent and level
     {
 
+        // parent and level
         for (int64_t k = 0 ; k < n ; k++)
         {
             LAGRAPH_TRY (GrB_assign (q, q, NULL, ramp, GrB_ALL, n, GrB_DESC_S));
