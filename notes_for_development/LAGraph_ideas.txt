@@ -1,0 +1,130 @@
+
+Algorithms in GraphBLAS vs Kepner & Gilbert's book:
+
+Graph partitioning
+    we already have the Fiedler vector, graph coarsening, pseudo-peripheral
+    nodes, and more, as useful tools.  See p38 of Kepner & Gilbert (KG).
+
+Graph generators
+    we have LAGraph_Random_Matrix (Erdos/Renyi).
+    need: RMAT, preferential attachment, 2D/3D mesh generator, ...
+    see also stochastic Kronecker graphs (ch 9 and section 10.3 of KG).
+
+Bellman Ford: we have delta-stepping sssp, but we could use an sssp that
+    finds the shortest-path tree.  See p48 of KG.
+
+Floyd-Warshall, all-pairs shortest paths: a very easy algorithm, just
+    costly
+
+block edge-betweenness centrality: to be fast enough, will likely need some
+    updates to the internal kernels in GraphBLAS
+
+tensor operations:  can these be done in LAGraph, with GraphBLAS underneath?
+    see chap 7 of KG and tensortoolbox.org.
+
+graph visualization:
+    interface to graphviz,
+    or write our own energy minimization (or both)
+
+ch 12 of KG: more centrality metrics:
+    closeness, stress, 
+
+
+Algorithms in NetworkX: (as compared to LAGraph)
+    approximations and heuristics: 
+        we only have MIS and diameter; many more could be done
+    assortivity: we have none of these ("none", below)
+    asteroidal: none
+    bipartite: we have maximum bipartite matching
+    boundary: none
+    brides: none;
+        a chain decomposition looks hard (requires a DFS)
+    broadcast (on a tree): none
+    centrality:
+        we have betweeness centralities (node and edge), need many more
+        some are already in python graphblas
+    chordal: none
+    clique: none
+    clustering:  we have square clustering, Markov clustering,
+        peer pressure clustering, local-clustering coefficents, and triangle
+        counts; need many more
+    coloring: we have many of these, but not all strategies
+    communicability: none
+    communities: we have CDLP, and Louvain in progress
+    components: we have strongly connected components and connected components
+        of an undirected graph; many more needed
+    connectivity: none
+    cores: we have k-cores and k-truss; many more needed
+    covering: none; but we have the related maximum matching method it uses
+    cycles: none
+    cuts: none, but many in the python graphblas algorithms
+    d-separation: none
+    dags: none
+    distance measures:  we have diameter, periphery, and eccentricity
+    distance-regular graphs: none
+    dominance: none
+    dominating sets: none
+    efficiency: none, but appears in python graphblas algo
+    eulerian: none
+    maxflow: yes, but not min cut, and no capacity_scaling
+    hashing: none, but isomorphism in progress
+    graphical deg sequence: none
+    hierarchy: none
+    hybrid: none
+    isolates: none, but very simple; also in python graphblas algo
+    isomorphism: in progress
+    link analysis: done; we have page rank and HITS
+    link prediction: none
+    lowest common ancestor: none
+    matching: we have maximal matching and maximum bipartite matching;
+        could use more variants here
+    minors: none
+    maximal independent set: done
+    non-randomness: none
+    moral graph: none
+    node classification: none
+    operators: none, but many are likely trivial in graphblas
+        and some are in python graphblas algo
+    planarity: none
+    planar drawing: none
+    graph polynomials: none
+    reciprocity: none, but they are in python graphblas algo
+    regular: none, but appear in python graphblas algo, except for
+        k_factor
+    rich club coefficient: done
+    shortest paths: we have many of these, but not A*, and we don't have
+        a method to report the shortest paths themselves (except BFS tree)
+    similarity: none
+    simple paths: none
+    small world: we have random swaps
+    s_metric: not in LAGraph but appears in python graphblas algo
+    sparsifiers: none
+    structural holes: none
+    summarization: none
+    swap: we have random double-edge swaps, but not triple edge
+    threshold graphs: none
+    time dependent: none
+    tournament: none, but maybe is_tournament in progress
+    traversal:
+        no DFS (these would be hard in graphblas)
+        most BFS (but missing some variants)
+        no beam search
+        no edge_BFS (what is this?)
+    tree: only min spanning forest; need many more
+    triads: none
+    vitality: none
+    voronoi_cells: none
+    walks: none
+    weiner index: none
+
+Functions in NetworkX: most would be simple in graphblas
+
+Graph Generators in NetworkX: many appear, we have very few;
+    consider an interface to the SuiteSparse matrix collection;
+    can use more (RMAT in particular)
+
+Linear Algebra in NetworkX:
+    we have Fiedler vector, Laplacian matrix
+    many other methods trivial in graphblas
+    many methods needed here
+
